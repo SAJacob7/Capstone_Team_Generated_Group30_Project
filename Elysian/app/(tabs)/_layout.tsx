@@ -1,5 +1,5 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Tabs, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
@@ -8,6 +8,22 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const router = useRouter();
+  const [isReady, setIsReady] = useState(false);
+
+  const isLoggedIn = false; // Replace with real auth logic
+
+  useEffect(() => {
+    // Wait one tick to ensure router is mounted
+    const timeout = setTimeout(() => setIsReady(true), 0);
+    return () => clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    if (isReady && !isLoggedIn) {
+      router.replace('/landing_page');
+    }
+  }, [isReady, isLoggedIn, router]);
 
   return (
     <Tabs
