@@ -23,7 +23,7 @@ const LandingPage = () => {
       {/* Buttons */}
       <TouchableOpacity
         style={styles.primaryButton}
-        onPress={() => router.navigate("SignUp" as never)}
+        onPress={() => router.push("/create_account")}
       >
         <Text style={styles.primaryText}>Get Started</Text>
       </TouchableOpacity>
