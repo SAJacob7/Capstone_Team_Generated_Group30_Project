@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { TextInput, Button, Text, } from 'react-native-paper';
 import { useRouter } from 'expo-router';
-import { styles } from './landing_page.styles';
+import { styles } from './app_styles.styles';
 
 export default function HomePage() {
   const router = useRouter();

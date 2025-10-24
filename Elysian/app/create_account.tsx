@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View, StyleSheet, Alert} from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import { useRouter } from 'expo-router';
-import { styles } from './create_account.styles'; 
+import { styles, inputTheme } from './app_styles.styles'; 
 
 export default function CreateAccountScreen() {
   const router = useRouter();
@@ -32,55 +32,66 @@ export default function CreateAccountScreen() {
 
   return (
     <View style={styles.container}>
-      <Text variant="headlineMedium" style={styles.title}>Create an Account</Text>
+      <Text variant="headlineMedium" style={styles.title}>Sign Up Now</Text>
+            <Text variant="bodyLarge" style={styles.subtext}>Fill in the details and create account.</Text>
       <TextInput
         label="Full Name"
         value={name}
         onChangeText={setName}
+        mode="outlined"
         style={styles.input}
+        theme={inputTheme}
       />
       <TextInput
         label="Username"
         value={username}
         onChangeText={setUsername}
+        mode="outlined"
         style={styles.input}
         autoCapitalize="none"
+        theme={inputTheme}
       />
       <TextInput
         label="Email"
         value={email}
         onChangeText={setEmail}
+        mode="outlined"
         style={styles.input}
         keyboardType="email-address"
         autoCapitalize="none"
+        theme={inputTheme}
       />
       <TextInput
         label="Create Password"
         value={password}
         onChangeText={setPassword}
+        mode="outlined"
         style={styles.input}
         secureTextEntry
+        theme={inputTheme}
       />
         <TextInput
         label="Confirm Password"
         value={confirmPassword}
         onChangeText={setConfirmPassword}
+        mode="outlined"
         style={styles.input}
         secureTextEntry
+        theme={inputTheme}
       />
       <Button
-        mode="contained"
-        onPress={handleCreateAccount}
-        loading={loading}
-        style={styles.button}
+        mode="contained" 
+        onPress={handleCreateAccount} 
+        style={styles.button} 
+        labelStyle={styles.buttonLabel}
       >
         {loading ? "Creating Account..." : "Create Account"}
       </Button>
 
-      <View style={styles.signinContainer}>
+      <View style={styles.signupContainer}>
         <Text>
           Already have an account?{" "}
-          <Text style={styles.signinLink} onPress={goToSignIn}>Sign in</Text>
+          <Text style={styles.signupLink} onPress={goToSignIn}>Sign in</Text>
         </Text>
       </View>
     </View>
