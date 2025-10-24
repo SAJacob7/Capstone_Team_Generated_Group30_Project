@@ -1,12 +1,22 @@
 import { useEffect, useRef } from 'react';
-import { View, StyleSheet, Image, Animated } from 'react-native';
+import { Image, Animated } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Text } from 'react-native-paper';
-import { useRouter } from 'expo-router';
 import { styles } from './app_styles.styles';
 
-export default function LandingPage() {
-  const router = useRouter();
+type LandingScreenProp = NativeStackNavigationProp<RootParamList, 'landing'>;
+export type RootParamList = {
+  login: undefined;
+  home: undefined;
+  landing: undefined;
+};
+
+const landing = () => {
+  const router = useNavigation();
   const fadeAnim = useRef(new Animated.Value(1)).current; // Start fully visible
+  const navigation = useNavigation<LandingScreenProp>();
+  
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -16,7 +26,7 @@ export default function LandingPage() {
         duration: 1000, // Fade out duration (ms)
         useNativeDriver: true,
       }).start(() => {
-        router.push('/sign_in');
+        navigation.push('login');
       });
     }, 3000);
 
@@ -27,10 +37,11 @@ export default function LandingPage() {
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       <Text variant="displayMedium" style={styles.title}>Elysian</Text>
       <Image
-        source={require('../assets/images/landing-page-image.png')}
+        source={require('../../assets/landing-page-image.png')}
         style={styles.image}
         resizeMode="contain"
       />
     </Animated.View>
   );
 }
+export default landing;
