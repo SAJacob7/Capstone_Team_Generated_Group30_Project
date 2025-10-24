@@ -5,16 +5,16 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { styles } from './app_styles.styles';
 
-type HomeScreenProp = NativeStackNavigationProp<RootParamList, 'home'>;
+type ProfileSetUpScreenProp = NativeStackNavigationProp<RootParamList, 'profileSetUp'>;
 export type RootParamList = {
-  home: undefined;
+  profileSetUp: undefined;
 };
-const home = () => {
-  const navigation = useNavigation<HomeScreenProp>();
+const profileSetUp = () => {
+  const navigation = useNavigation<ProfileSetUpScreenProp>();
   return (
     <View style={styles.container}>
-      <Text variant="headlineLarge" style={styles.title}>Your Adventure Starts Here!</Text>
+      <Text variant="headlineLarge" style={styles.title}>Profile Set Up Page</Text>
     </View>
   );
 }
-export default home;
+export default profileSetUp;

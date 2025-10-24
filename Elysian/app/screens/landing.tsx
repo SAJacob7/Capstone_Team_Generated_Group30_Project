@@ -13,7 +13,6 @@ export type RootParamList = {
 };
 
 const landing = () => {
-  const router = useNavigation();
   const fadeAnim = useRef(new Animated.Value(1)).current; // Start fully visible
   const navigation = useNavigation<LandingScreenProp>();
   
@@ -31,7 +30,7 @@ const landing = () => {
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [router]);
+  }, []);
 
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
