@@ -6,6 +6,7 @@ import { styles, inputTheme } from './app_styles.styles';
 import { 
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  updateProfile,
 } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -15,6 +16,7 @@ export type RootParamList = {
   login: undefined;
   home: undefined;
   signUp: undefined;
+  profileSetUp: undefined;
 };
 
 type SignUpScreenProp = NativeStackNavigationProp<RootParamList, 'signUp'>;
@@ -37,36 +39,31 @@ const signUp = () => {
     if (password !== confirmPassword) { 
         Alert.alert("Passwords do not match", "Re-enter your password.")
     }
-  };
-
-  // Auto-login / session persistence
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (currentUser) => {
-      if (currentUser) {
-        navigation.replace('home'); // Navigate to Home if already logged in
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  const handleSignUp = async () => {
     setLoading(true);
     try {
-      const response = await createUserWithEmailAndPassword(
-        FIREBASE_AUTH,
-        email.trim(),
-        password.trim()
-      );
-      console.log('Created user:', response.user);
-      Alert.alert('Success', `Account created for ${response.user.email}`);
+      const userCredential = await createUserWithEmailAndPassword(FIREBASE_AUTH, email, password);
+      const user = userCredential.user;
+      // Below line should remember user name in session, but not sure if working.
+      // await updateProfile(user, { displayName: name });
+      navigation.push('profileSetUp'); // Navigate to profile page set up once account created.
     } catch (error: any) {
-      console.log('Sign-up error:', error.code, error.message);
-      Alert.alert('Sign-up Failed', error.message);
+      Alert.alert("Sign Up Failed", error.message);
     } finally {
       setLoading(false);
     }
   };
+
+  // Commented out for now, because it doesn't work fully.
+  // Auto-login / session persistence
+  // useEffect(() => {
+  //   const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (currentUser) => {
+  //     if (currentUser) {
+  //       navigation.replace('home'); // Navigate to Home if already logged in
+  //     }
+  //   });
+
+  //   return () => unsubscribe();
+  // }, []);
 
   const goToSignIn = async () => {
     navigation.push('login')
@@ -110,6 +107,7 @@ const signUp = () => {
         mode="outlined"
         style={styles.input}
         secureTextEntry
+        textContentType="newPassword"
         theme={inputTheme}
       />
         <TextInput
@@ -119,6 +117,7 @@ const signUp = () => {
         mode="outlined"
         style={styles.input}
         secureTextEntry
+        textContentType="newPassword"
         theme={inputTheme}
       />
       <Button
