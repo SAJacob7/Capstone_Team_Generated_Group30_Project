@@ -50,7 +50,43 @@ export const styles = StyleSheet.create({
     width: 350,
     height: 350,
     marginTop: 20,
-  }
+  },
+
+
+  gridContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap", // allows buttons to wrap to new rows automatically
+    justifyContent: "space-between",
+    marginVertical: 20,
+  },
+
+  answerButton: {
+    width: "48%",            // fits two buttons per row with a small gap
+    aspectRatio: 1,          // keeps them square regardless of screen size
+    borderWidth: 2,
+    borderColor: "#ccc",
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+    backgroundColor: "#f5f5f5",
+  },
+
+  answerButtonSelected: {
+    borderColor: "#007AFF",
+    backgroundColor: "#007AFF",
+  },
+
+  answerText: {
+    fontSize: 16,
+    color: "#333",
+    textAlign: "center",
+    fontWeight: "500",
+  },
+
+  answerTextSelected: {
+    color: "#fff",
+  },
 });
 
 export const inputTheme = {

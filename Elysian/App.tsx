@@ -5,6 +5,7 @@ import login from './app/screens/login';
 import home from './app/screens/home';
 import landing from './app/screens/landing';
 import signUp from './app/screens/sign_up';
+import profileLanding from './app/screens/profile_landing';
 import profileSetUp from './app/screens/profile_set_up';
 
 const Stack = createNativeStackNavigator();
@@ -16,18 +17,9 @@ export default function App() {
         <Stack.Screen name='login' component={login} options={({ headerShown: false})} />
         <Stack.Screen name='home' component={home} options={({ headerShown: false})} />
         <Stack.Screen name='signUp' component={signUp} options={({ headerShown: false})} />
+        <Stack.Screen name='profileLanding' component={profileLanding} options={({ headerShown: false})} />
         <Stack.Screen name='profileSetUp' component={profileSetUp} options={({ headerShown: false})} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
-
