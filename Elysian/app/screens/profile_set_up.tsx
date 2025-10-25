@@ -1,9 +1,12 @@
-import { useState, useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { useState } from 'react';
+import { View, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Text, } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { inputTheme, styles } from './app_styles.styles';
+import { doc, setDoc } from 'firebase/firestore';
+import { FIREBASE_DB } from '../../FirebaseConfig';
+import { getAuth } from 'firebase/auth';
 
 type ProfileSetUpScreenProp = NativeStackNavigationProp<RootParamList, 'profileSetUp'>;
 export type RootParamList = {
@@ -46,6 +49,26 @@ const profileSetUp = () => {
     }
   };
 
+  const handleSubmit = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      alert('Error, User must be signed in!');
+      return;
+    }
+
+    try{
+      const userDocRef = doc(FIREBASE_DB, 'userProfiles', user.uid);
+      await setDoc(userDocRef, {responses}, {merge: true});
+      alert('Success, Your Answers have been saved!');
+    }
+    catch (error) {
+      console.error('Encountered an error while saving your answer:', error);
+      alert('Error, There was an werror while saving your answers.')
+    }
+  };
+
   // Handles action when next button is selected
   const nextQuestion = () => {
     // Check that there is an answer typed for short answer questions
@@ -75,7 +98,7 @@ const profileSetUp = () => {
     // Otherwise, the user has answered all questions
     // Navigate to home page
     else {
-      // STORE THE USER ANSWERS IN DATABASE
+      handleSubmit();
       console.log("All User Responses: ", responses); // Print response
       navigation.navigate("home");
     }
@@ -137,5 +160,4 @@ const profileSetUp = () => {
     </View>
   );
 };
-
 export default profileSetUp;
