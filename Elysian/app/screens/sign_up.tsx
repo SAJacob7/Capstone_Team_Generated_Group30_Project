@@ -16,7 +16,7 @@ export type RootParamList = {
   login: undefined;
   home: undefined;
   signUp: undefined;
-  profileSetUp: undefined;
+  profileLanding: undefined;
 };
 
 type SignUpScreenProp = NativeStackNavigationProp<RootParamList, 'signUp'>;
@@ -45,7 +45,7 @@ const signUp = () => {
       const user = userCredential.user;
       // Below line should remember user name in session, but not sure if working.
       // await updateProfile(user, { displayName: name });
-      navigation.push('profileSetUp'); // Navigate to profile page set up once account created.
+      navigation.push('profileLanding'); // Navigate to profile page set up once account created.
     } catch (error: any) {
       Alert.alert("Sign Up Failed", error.message);
     } finally {

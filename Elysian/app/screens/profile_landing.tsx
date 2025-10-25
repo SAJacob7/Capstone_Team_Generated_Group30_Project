@@ -1,30 +1,29 @@
 import { useEffect, useRef } from 'react';
-import { Image, Animated } from 'react-native';
+import { Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Text } from 'react-native-paper';
 import { styles } from './app_styles.styles';
 
-type LandingScreenProp = NativeStackNavigationProp<RootParamList, 'landing'>;
+type ProfileLandingScreenProp = NativeStackNavigationProp<RootParamList, 'profileLanding'>;
 export type RootParamList = {
-  login: undefined;
-  home: undefined;
-  landing: undefined;
+  profileSetUp: undefined;
+  profileLanding: undefined;
 };
 
-const landing = () => {
+const profileLanding = () => {
   const fadeAnim = useRef(new Animated.Value(1)).current; // Start fully visible
-  const navigation = useNavigation<LandingScreenProp>();
+  const navigation = useNavigation<ProfileLandingScreenProp>();
   
   useEffect(() => {
     const timer = setTimeout(() => {
       // Fade out animation before navigating
       Animated.timing(fadeAnim, {
         toValue: 0,
-        duration: 1000, // Fade out duration (ms)
+        duration: 300, // Fade out duration (ms)
         useNativeDriver: true,
       }).start(() => {
-        navigation.push('login');
+        navigation.push('profileSetUp');
       });
     }, 3000);
 
@@ -33,13 +32,10 @@ const landing = () => {
 
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-      <Text variant="displayMedium" style={styles.title}>Elysian</Text>
-      <Image
-        source={require('../../assets/landing-page-image.png')}
-        style={styles.image}
-        resizeMode="contain"
-      />
+      <Text variant="headlineMedium" style={styles.title}>Let's get to know you better!</Text>
+      <Text variant="bodyLarge" style={styles.title}>Answers these questions so we can curate the best places for you!</Text>
     </Animated.View>
   );
 }
-export default landing;
+
+export default profileLanding;
