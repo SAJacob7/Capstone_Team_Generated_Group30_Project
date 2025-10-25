@@ -49,7 +49,7 @@ const profileSetUp = () => {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (finalResponses: { [key: number]: string[] | string }) => {
     const auth = getAuth();
     const user = auth.currentUser;
 
@@ -60,7 +60,7 @@ const profileSetUp = () => {
 
     try{
       const userDocRef = doc(FIREBASE_DB, 'userProfiles', user.uid);
-      await setDoc(userDocRef, {responses}, {merge: true});
+      await setDoc(userDocRef, {responses: finalResponses}, {merge: true});
       alert('Success, Your Answers have been saved!');
     }
     catch (error) {
@@ -98,7 +98,10 @@ const profileSetUp = () => {
     // Otherwise, the user has answered all questions
     // Navigate to home page
     else {
-      handleSubmit();
+      const finalResponses = {
+        ...responses, [currentQuestionIndex]: isShortAnswer ? typedAnswer : chosenAnswers[currentQuestionIndex],
+      }
+      handleSubmit(finalResponses);
       console.log("All User Responses: ", responses); // Print response
       navigation.navigate("home");
     }
