@@ -1,24 +1,31 @@
+/* 
+File: App.tsx
+Function: This is the main entry point of the React Native app. It defines the app's navigation structure using React Navigation's Native Stack Navigator. Each screen is registered here and can be navigated between throughout the app.
+*/
+
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { StyleSheet } from 'react-native';
-import login from './app/screens/login';
-import home from './app/screens/home';
-import landing from './app/screens/landing';
-import signUp from './app/screens/sign_up';
-import profileLanding from './app/screens/profile_landing';
-import profileSetUp from './app/screens/profile_set_up';
+import Login from './app/screens/login';
+import Home from './app/screens/home';
+import Landing from './app/screens/landing';
+import SignUp from './app/screens/sign_up';
+import ProfileLanding from './app/screens/profile_landing';
+import ProfileSetup from './app/screens/profile_setup';
 
+// Create a stack navigator instance
 const Stack = createNativeStackNavigator();
+
 export default function App() {
   return (
+    // NavigationContainer manages the navigation tree and history
     <NavigationContainer> 
-      <Stack.Navigator initialRouteName = 'landing'>
-        <Stack.Screen name='landing' component={landing} options={({ headerShown: false})} />
-        <Stack.Screen name='login' component={login} options={({ headerShown: false})} />
-        <Stack.Screen name='home' component={home} options={({ headerShown: false})} />
-        <Stack.Screen name='signUp' component={signUp} options={({ headerShown: false})} />
-        <Stack.Screen name='profileLanding' component={profileLanding} options={({ headerShown: false})} />
-        <Stack.Screen name='profileSetUp' component={profileSetUp} options={({ headerShown: false})} />
+      <Stack.Navigator initialRouteName = 'Landing'>
+        <Stack.Screen name='Landing' component={Landing} options={({ headerShown: false})} />
+        <Stack.Screen name='Login' component={Login} options={({ headerShown: false})} />
+        <Stack.Screen name='Home' component={Home} options={({ headerShown: false})} />
+        <Stack.Screen name='SignUp' component={SignUp} options={({ headerShown: false})} />
+        <Stack.Screen name='ProfileLanding' component={ProfileLanding} options={({ headerShown: false})} />
+        <Stack.Screen name='ProfileSetup' component={ProfileSetup} options={({ headerShown: false})} />
       </Stack.Navigator>
     </NavigationContainer>
   );

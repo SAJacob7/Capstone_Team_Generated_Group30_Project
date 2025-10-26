@@ -1,3 +1,8 @@
+/* 
+File: sign_up.tsx
+Function: This is the Sign Up screen component for the app that allows users to create an account. Firebase is used to store new user credentials.
+*/
+
 import { View, Alert } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import React, { useState, useEffect } from 'react';
@@ -5,23 +10,22 @@ import { FIREBASE_AUTH } from '../../FirebaseConfig';
 import { styles, inputTheme } from './app_styles.styles';
 import { 
   createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  updateProfile,
 } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-// Define your navigation param list
+// Define the navigation parameter list
 export type RootParamList = {
-  login: undefined;
-  home: undefined;
+  Login: undefined;
+  Home: undefined;
   signUp: undefined;
   profileLanding: undefined;
 };
 
+// Define the type for Home screen navigation prop
 type SignUpScreenProp = NativeStackNavigationProp<RootParamList, 'signUp'>;
 
-const signUp = () => {
+const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,22 +34,31 @@ const signUp = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigation = useNavigation<SignUpScreenProp>();
 
+  // Handle account create with Firebase
   const handleCreateAccount = async () => {
+    // Validate that all fields are filled
     if (!name || !email || !password || !confirmPassword) { 
         Alert.alert("Mising Information", "Please fill in all fields.");
         return; 
     }
     
+    // Check that password and confirmPassword matches
     if (password !== confirmPassword) { 
         Alert.alert("Passwords do not match", "Re-enter your password.")
     }
+
     setLoading(true);
+
     try {
+      // Create new user with email and password in Firebase
       const userCredential = await createUserWithEmailAndPassword(FIREBASE_AUTH, email, password);
       const user = userCredential.user;
+
       // Below line should remember user name in session, but not sure if working.
       // await updateProfile(user, { displayName: name });
-      navigation.push('profileLanding'); // Navigate to profile page set up once account created.
+
+
+      navigation.push('profileLanding'); // Navigate to Profile Setup page once acccount is created
     } catch (error: any) {
       Alert.alert("Sign Up Failed", error.message);
     } finally {
@@ -65,14 +78,16 @@ const signUp = () => {
   //   return () => unsubscribe();
   // }, []);
 
+  // Handle navigation to Login screen
   const goToSignIn = async () => {
-    navigation.push('login')
+    navigation.push('Login')
   }
 
   return (
     <View style={styles.container}>
       <Text variant="headlineMedium" style={styles.title}>Sign Up Now</Text>
             <Text variant="bodyLarge" style={styles.subtext}>Fill in the details and create account.</Text>
+
       <TextInput
         label="Full Name"
         value={name}
@@ -81,6 +96,7 @@ const signUp = () => {
         style={styles.input}
         theme={inputTheme}
       />
+
       <TextInput
         label="Username"
         value={username}
@@ -90,6 +106,7 @@ const signUp = () => {
         autoCapitalize="none"
         theme={inputTheme}
       />
+
       <TextInput
         label="Email"
         value={email}
@@ -100,6 +117,7 @@ const signUp = () => {
         autoCapitalize="none"
         theme={inputTheme}
       />
+
       <TextInput
         label="Create Password"
         value={password}
@@ -110,6 +128,7 @@ const signUp = () => {
         textContentType="newPassword"
         theme={inputTheme}
       />
+
         <TextInput
         label="Confirm Password"
         value={confirmPassword}
@@ -120,6 +139,7 @@ const signUp = () => {
         textContentType="newPassword"
         theme={inputTheme}
       />
+
       <Button
         mode="contained" 
         onPress={handleCreateAccount} 
@@ -139,4 +159,4 @@ const signUp = () => {
   );
 };
 
-export default signUp;
+export default SignUp;

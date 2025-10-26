@@ -1,3 +1,8 @@
+/* 
+File: profile_setup.tsx
+Function: This is the Profile Setup screen component for the app. Users answer questions to curate their travel profile.
+*/
+
 import { useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Text, } from 'react-native-paper';
@@ -8,13 +13,21 @@ import { doc, setDoc } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../FirebaseConfig';
 import { getAuth } from 'firebase/auth';
 
-type ProfileSetUpScreenProp = NativeStackNavigationProp<RootParamList, 'profileSetUp'>;
+// Define the type for Home screen navigation prop
 export type RootParamList = {
-  profileSetUp: undefined;
-  home: undefined;
+  ProfileSetup: undefined;
+  Home: undefined;
 };
-const profileSetUp = () => {
+
+// Define the type for Home screen navigation prop
+type ProfileSetUpScreenProp = NativeStackNavigationProp<RootParamList, 'ProfileSetup'>;
+
+// Profile Setup component
+const ProfileSetup = () => {
+  // Initialize navigation with type safety
   const navigation = useNavigation<ProfileSetUpScreenProp>();
+
+  // List of questions for user
   const questions = [{question: "Where are you traveling from?", answer: []},
     {question: "What type of vacation are you looking for?", answer: ["Beach", "City", "Historical", "Adventure", "Nature", "Religious"]},
     {question: "What seasons do you like?", answer: ["Spring", "Summer", "Fall", "Winter"]},
@@ -23,6 +36,7 @@ const profileSetUp = () => {
     {question: "How far do you want to travel?", answer: ["Within your Country", "Within your Continent", "Outside of your Continent", "Anywhere"]},
     {question: "What type of place do you like?", answer: ["Quiet", "Moderate", "Busy"]},
   ];
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // Stores the index of the current question
   const [chosenAnswers, setChosenAnswers] = useState<{ [key: number]: string[] }>({}); // Stores the choosen answer for each multi-select questions
   const [typedAnswer, setTypedAnswer] = useState(""); // Stores the typed answer for the short answer questions 
@@ -49,6 +63,7 @@ const profileSetUp = () => {
     }
   };
 
+  // Handles submission of answers and stores it in Firebase
   const handleSubmit = async (finalResponses: { [key: number]: string[] | string }) => {
     const auth = getAuth();
     const user = auth.currentUser;
@@ -103,7 +118,7 @@ const profileSetUp = () => {
       }
       handleSubmit(finalResponses);
       console.log("All User Responses: ", responses); // Print response
-      navigation.navigate("home");
+      navigation.navigate("Home");
     }
   };
 
@@ -127,40 +142,41 @@ const profileSetUp = () => {
         {currentQuestion.answer.map((answer, index) => {
           const selected = chosenAnswers[currentQuestionIndex]?.includes(answer);
 
-          return (
-            <TouchableOpacity
-              key={index}
-              onPress={() => answerSelected(answer)}
-              activeOpacity={0.8}
-              style={[
-                styles.answerButton,
-                selected && styles.answerButtonSelected,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.answerText,
-                  selected && styles.answerTextSelected,
-                ]}
-              >
-                {answer}
-              </Text>
-            </TouchableOpacity>
-          );
+        return (
+          <TouchableOpacity
+            key={index}
+            onPress={() => answerSelected(answer)}
+            activeOpacity={0.8}
+            style={[
+              styles.answerButton,
+              selected && styles.answerButtonSelected,
+            ]}
+          >
+          <Text
+            style={[
+              styles.answerText,
+              selected && styles.answerTextSelected,
+            ]}
+          >
+            {answer}
+          </Text>
+          </TouchableOpacity>
+        );
         })}
       </View>
-
       )}
 
-      <Button
-        mode="contained"
-        onPress={nextQuestion}
-        style={[styles.button, styles.button]}
-        labelStyle={styles.buttonLabel}
-      >
-        {currentQuestionIndex < questions.length - 1 ? "Next" : "Generate Recommendations!"}
-      </Button>
+      {/* Next or Finish button */}
+        <Button
+          mode="contained"
+          onPress={nextQuestion}
+          style={styles.button}
+          labelStyle={styles.buttonLabel}
+        >
+          {currentQuestionIndex < questions.length - 1 ? "Next" : "Generate Recommendations!"}
+        </Button>
     </View>
   );
 };
-export default profileSetUp;
+
+export default ProfileSetup;
