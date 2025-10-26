@@ -13,3 +13,5 @@ Reference them here:
 - [Sprint 1](https://github.com/users/SAJacob7/projects/5)
 - [Sprint 2](https://github.com/users/SAJacob7/projects/7/views/1)
 - [Sprint 3](https://github.com/users/SAJacob7/projects/8)
+- [**Meeting Logs**](https://github.com/SAJacob7/Capstone_Team_Generated_Group30_Project/wiki/Team-Meeting-Logs)
+  
