@@ -1,3 +1,8 @@
+/* 
+File: login.tsx
+Function: This is the Login screen component for the app that displays the app logo.
+*/
+
 import { View, Alert } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import React, { useState, useEffect } from 'react';
@@ -10,34 +15,41 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-// Define your navigation param list
+// Define the navigation parameter list
 export type RootParamList = {
-  login: undefined;
-  home: undefined;
-  signUp: undefined;
+  Login: undefined;
+  Home: undefined;
+  SignUp: undefined;
 };
 
-type LoginScreenProp = NativeStackNavigationProp<RootParamList, 'login'>;
+// Define the type for Home screen navigation prop
+type LoginScreenProp = NativeStackNavigationProp<RootParamList, 'Login'>;
 
-const login = () => {
+// Login component
+const Login = () => {
+  // State hooks for email, password, and loading status
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Initialize navigation with type safety
   const navigation = useNavigation<LoginScreenProp>();
 
   // Auto-login / session persistence
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (currentUser) => {
       if (currentUser) {
-        navigation.replace('home'); // Navigate to Home if already logged in
+        navigation.replace('Home'); // Navigate to Home if user is already logged in
       }
     });
 
-    return () => unsubscribe();
+    return () => unsubscribe(); // Cleanup subscription on unmount
   }, []);
 
+  // Handles user sign in 
   const signIn = async () => {
     setLoading(true);
+
     try {
       const response = await signInWithEmailAndPassword(
         FIREBASE_AUTH,
@@ -54,14 +66,16 @@ const login = () => {
     }
   };
 
+  // Handles navigation to SignUp screen
   const signUp = async () =>{
-    navigation.push('signUp')
+    navigation.push('SignUp')
   }
 
   return (
     <View style={styles.container}>
       <Text variant="headlineMedium" style={styles.title}>Sign In Now</Text>
       <Text variant="bodyLarge" style={styles.subtext}>Please sign in to start your adventure!</Text>
+    
       <TextInput
         label="Email"
         value={email}
@@ -72,6 +86,7 @@ const login = () => {
         autoCapitalize="none"
         theme={inputTheme}
       />
+
       <TextInput
         label="Password"
         value={password}
@@ -81,6 +96,7 @@ const login = () => {
         secureTextEntry
         theme={inputTheme}
       />
+
       <Button 
         mode="contained" 
         onPress={signIn} 
@@ -88,6 +104,7 @@ const login = () => {
         labelStyle={styles.buttonLabel}>
         Login
       </Button>
+
       <View style={styles.signupContainer}>
         <Text>
           Don't have an account?{" "}
@@ -100,6 +117,4 @@ const login = () => {
   );
 };
 
-export default login;
-
-
+export default Login;
