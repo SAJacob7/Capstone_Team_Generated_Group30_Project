@@ -18,12 +18,12 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 export type RootParamList = {
   Login: undefined;
   Home: undefined;
-  signUp: undefined;
-  profileLanding: undefined;
+  SignUp: undefined;
+  ProfileLanding: undefined;
 };
 
 // Define the type for Home screen navigation prop
-type SignUpScreenProp = NativeStackNavigationProp<RootParamList, 'signUp'>;
+type SignUpScreenProp = NativeStackNavigationProp<RootParamList, 'SignUp'>;
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -58,7 +58,7 @@ const SignUp = () => {
       // await updateProfile(user, { displayName: name });
 
 
-      navigation.push('profileLanding'); // Navigate to Profile Setup page once acccount is created
+      navigation.push('ProfileLanding'); // Navigate to Profile Setup page once acccount is created
     } catch (error: any) {
       Alert.alert("Sign Up Failed", error.message);
     } finally {
