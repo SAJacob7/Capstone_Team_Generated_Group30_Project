@@ -61,48 +61,70 @@ export const styles = StyleSheet.create({
   },
 
   gridContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap", // Allows buttons to wrap to new rows automatically
-    justifyContent: "space-between",
-    marginVertical: 20,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    rowGap: 10, // Minimal vertical spacing
+    columnGap: 10, // Consistent spacing between columns (if RN 0.71+)
+
   },
 
   answerButton: {
-    width: "48%",            // fits two buttons per row with a small gap
-    aspectRatio: 1,          // keeps them square regardless of screen size
-    borderWidth: 2,
-    borderColor: "#ccc",
+    flexBasis: '48%', // Two buttons per row
+    height: 120,
+    backgroundColor: '#F7F7F9', // Same light gray as input background
+    borderColor: '#E5E5E5',
+    borderWidth: 1,
     borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 10,
-    backgroundColor: "#f5f5f5",
+    paddingVertical: 14,
+    marginBottom: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000', // Subtle shadow for iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
 
   answerButtonSelected: {
-    borderColor: "#007AFF",
-    backgroundColor: "#007AFF",
+    backgroundColor: '#008CFF', // Brand blue when selected
+    shadowOpacity: 0.2,
   },
 
   answerText: {
+    color: '#1B1E28',
     fontSize: 16,
-    color: "#333",
-    textAlign: "center",
-    fontWeight: "500",
+    fontWeight: '500',
+    textAlign: 'center',
   },
 
   answerTextSelected: {
-    color: "#fff",
+    color: '#FFFFFF', // White text on blue button
+    fontWeight: '700',
   },
+
+  questionText: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    color: '#1B1E28',
+    marginBottom: 24,
+    paddingHorizontal: 10,
+  },
+
 });
 
 export const inputTheme = {
   roundness: 50,
   colors: {
-    primary: '#008CFF',    // Underline and label when focused
+    primary: '#008CFF', // Underline and label when focused
     background: '#F7F7F9', // Input background color
-    text: '#1B1E28',       // Input text color
-    placeholder: '#807f7fff', // label/placeholder color
+    text: '#1B1E28', // Input text color
+    placeholder: '#807f7fff', // Label/placeholder color
     outline: 'transparent',
   },
 };
+
+export const selectedColors = [
+  '#95CD00',
+  '#F49F9A',
+  '#FBD605',
+];

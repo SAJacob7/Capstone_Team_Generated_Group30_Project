@@ -8,7 +8,7 @@ import { View, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Text, } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { inputTheme, styles } from './app_styles.styles';
+import { inputTheme, styles, selectedColors } from './app_styles.styles';
 import { doc, setDoc } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../FirebaseConfig';
 import { getAuth } from 'firebase/auth';
@@ -44,6 +44,15 @@ const ProfileSetup = () => {
   
   const currentQuestion = questions[currentQuestionIndex]; // Sets the current question based on current inde
   const isShortAnswer = currentQuestion.answer.length === 0; // If there is no answers to display, it is a short answer question; otherwise, it's multi-select
+
+  // Count how many previous questions have answer buttons
+  const buttonQuestionIndex = questions
+    .slice(0, currentQuestionIndex)
+    .filter(q => q.answer.length > 0).length;
+
+  // Pick color from the 4-color cycle
+  const currentSelectedColor = selectedColors[buttonQuestionIndex % selectedColors.length];
+
 
   // Handles user selection for mutli-select questions
   const answerSelected = (answer: string) => {
@@ -125,7 +134,7 @@ const ProfileSetup = () => {
   return (
     <View style={styles.container}>
       {/* Display the question. */}
-      <Text>{currentQuestion.question}</Text>
+      <Text style={styles.questionText}>{currentQuestion.question}</Text>
 
       {/* If the question is a short answer question, display like this: */}
       {isShortAnswer ? (
@@ -150,6 +159,7 @@ const ProfileSetup = () => {
             style={[
               styles.answerButton,
               selected && styles.answerButtonSelected,
+              selected && selected && { backgroundColor: currentSelectedColor },
             ]}
           >
           <Text
