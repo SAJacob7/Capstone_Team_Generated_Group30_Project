@@ -20,6 +20,7 @@ export type RootParamList = {
   Login: undefined;
   Home: undefined;
   SignUp: undefined;
+  NavigationBar: undefined;
 };
 
 // Define the type for Home screen navigation prop
@@ -39,7 +40,7 @@ const Login = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (currentUser) => {
       if (currentUser) {
-        navigation.replace('Home'); // Navigate to Home if user is already logged in
+        navigation.replace('NavigationBar'); // Navigate to NavigationBar if user is already logged in
       }
     });
 
@@ -58,6 +59,7 @@ const Login = () => {
       );
       console.log('Signed in user:', response.user);
       Alert.alert('Success', `Welcome back, ${response.user.email}`);
+      navigation.replace('NavigationBar');
     } catch (error: any) {
       console.log('Sign-in error:', error.code, error.message);
       Alert.alert('Sign-in Failed', error.message);

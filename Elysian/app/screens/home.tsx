@@ -22,7 +22,7 @@ const Home = () => {
   // Initialize navigation with type safety
   const navigation = useNavigation<HomeScreenProp>();
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { flex: 1 }]}>
       <Text variant="headlineLarge" style={styles.title}>Your Adventure Starts Here!</Text>
     </View>
   );
