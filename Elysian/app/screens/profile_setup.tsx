@@ -17,6 +17,7 @@ import { getAuth } from 'firebase/auth';
 export type RootParamList = {
   ProfileSetup: undefined;
   Home: undefined;
+  NavigationBar: undefined;
 };
 
 // Define the type for Home screen navigation prop
@@ -127,7 +128,7 @@ const ProfileSetup = () => {
       }
       handleSubmit(finalResponses);
       console.log("All User Responses: ", responses); // Print response
-      navigation.navigate("Home");
+      navigation.replace("NavigationBar"); // Navigate to NavigationBar once user is done with questions
     }
   };
 

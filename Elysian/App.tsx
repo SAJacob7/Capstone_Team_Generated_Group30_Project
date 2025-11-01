@@ -11,6 +11,8 @@ import Landing from './app/screens/landing';
 import SignUp from './app/screens/sign_up';
 import ProfileLanding from './app/screens/profile_landing';
 import ProfileSetup from './app/screens/profile_setup';
+import Profile from './app/screens/profile';
+import NavigationBar from './app/screens/navigation_bar';
 
 // Create a stack navigator instance
 const Stack = createNativeStackNavigator();
@@ -26,6 +28,8 @@ export default function App() {
         <Stack.Screen name='SignUp' component={SignUp} options={({ headerShown: false})} />
         <Stack.Screen name='ProfileLanding' component={ProfileLanding} options={({ headerShown: false})} />
         <Stack.Screen name='ProfileSetup' component={ProfileSetup} options={({ headerShown: false})} />
+        <Stack.Screen name='Profile' component={Profile} options={({ headerShown: false})} />
+        <Stack.Screen name='NavigationBar' component={NavigationBar} options={({ headerShown: false})} />
       </Stack.Navigator>
     </NavigationContainer>
   );
