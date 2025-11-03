@@ -23,8 +23,8 @@ export default function NavigationBar() {
   // Dictionary to map page screens to icon names from Ionicons. https://ionic.io/ionicons
   const icons: { [key: string]: string } = { 
     Home: "home-outline",
-    Profile: "person-circle-outline",
-    Profile1: "heart-circle-outline", // Update
+    Profile: "heart-circle-outline",
+    Profile1: "person-circle-outline", // Update
     };
     
     return (

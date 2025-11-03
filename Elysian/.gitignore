@@ -41,3 +41,4 @@ yarn-error.*
 /android
 
 .env
+recommendation_engine/elysianproject-2b9ce-firebase-adminsdk-fbsvc-542db33246.json
