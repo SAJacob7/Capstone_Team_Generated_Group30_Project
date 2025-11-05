@@ -1,0 +1,88 @@
+city_id,city_name,country,continent,vacation_types,seasons,budget,vibe
+c000,New York,United States,North America,City,Fall|Spring|Summer,Premium,Busy
+c001,Los Angeles,United States,North America,City,Fall|Spring|Summer,Luxury,Busy
+c002,Chicago,United States,North America,City|Historical,Fall|Spring|Summer,Mid-Range,Moderate
+c003,Mexico City,Mexico,North America,City|Historical,Fall|Spring|Summer,Mid-Range,Busy
+c004,Toronto,Canada,North America,City,Fall|Spring|Summer,Mid-Range,Busy
+c005,Vancouver,Canada,North America,City,Fall|Spring|Summer,Budget Friendly,Moderate
+c006,São Paulo,Brazil,South America,Adventure|City|Nature,Fall|Spring|Summer,Budget Friendly,Busy
+c007,Buenos Aires,Argentina,South America,Adventure|City|Nature,Fall|Spring|Summer,Budget Friendly,Moderate
+c008,Bogotá,Colombia,South America,Adventure|City|Nature,Fall|Spring|Summer,Budget Friendly,Moderate
+c009,Lima,Peru,South America,Adventure|City|Historical|Nature,Fall|Spring|Summer,Mid-Range,Moderate
+c010,London,United Kingdom,Europe,City,Fall|Spring|Summer,Luxury,Busy
+c011,Paris,France,Europe,City,Fall|Spring|Summer,Premium,Busy
+c012,Berlin,Germany,Europe,City,Fall|Spring|Summer,Luxury,Quiet
+c013,Madrid,Spain,Europe,Beach|City,Fall|Spring|Summer,Luxury,Moderate
+c014,Rome,Italy,Europe,City|Historical,Fall|Spring|Summer,Mid-Range,Moderate
+c015,Barcelona,Spain,Europe,Beach|City,Fall|Spring|Summer,Luxury,Moderate
+c016,Lisbon,Portugal,Europe,Beach|City,Fall|Spring|Summer,Budget Friendly,Quiet
+c017,Amsterdam,Netherlands,Europe,City,Fall|Spring|Summer,Luxury,Moderate
+c018,Prague,Czech Republic,Europe,City|Historical,Fall|Spring|Summer,Luxury,Moderate
+c019,Istanbul,Turkey,Europe/Asia,City|Historical,Summer,Mid-Range,Busy
+c020,Moscow,Russia,Europe/Asia,City,Summer,Mid-Range,Moderate
+c021,Cairo,Egypt,Africa,Adventure|City|Historical|Nature,Fall|Spring|Summer|Winter,Luxury,Moderate
+c022,Cape Town,South Africa,Africa,Adventure|City|Nature,Fall|Spring|Summer|Winter,Luxury,Moderate
+c023,Johannesburg,South Africa,Africa,Adventure|City|Nature,Fall|Spring|Summer|Winter,Mid-Range,Quiet
+c024,Casablanca,Morocco,Africa,Adventure|City|Nature,Fall|Spring|Summer|Winter,Budget Friendly,Moderate
+c025,Nairobi,Kenya,Africa,Adventure|City|Nature,Fall|Spring|Summer|Winter,Budget Friendly,Moderate
+c026,Riyadh,Saudi Arabia,Asia,City,Fall|Spring|Summer|Winter,Budget Friendly,Moderate
+c027,Dubai,United Arab Emirates,Asia,City,Fall|Spring|Summer|Winter,Premium,Moderate
+c028,Doha,Qatar,Asia,City,Fall|Spring|Summer|Winter,Luxury,Moderate
+c029,Mumbai,India,Asia,City|Historical|Religious,Fall|Spring|Summer|Winter,Mid-Range,Busy
+c030,Delhi,India,Asia,City|Historical|Religious,Fall|Spring|Summer|Winter,Luxury,Busy
+c031,Bangalore,India,Asia,City|Historical|Religious,Fall|Spring|Summer|Winter,Mid-Range,Moderate
+c032,Bangkok,Thailand,Asia,Beach|City,Fall|Spring|Summer|Winter,Budget Friendly,Moderate
+c033,Singapore,Singapore,Asia,City,Fall|Spring|Summer|Winter,Luxury,Moderate
+c034,Kuala Lumpur,Malaysia,Asia,City,Fall|Spring|Summer|Winter,Luxury,Moderate
+c035,Hanoi,Vietnam,Asia,City,Fall|Spring|Summer|Winter,Mid-Range,Moderate
+c036,Ho Chi Minh City,Vietnam,Asia,City,Fall|Spring|Summer|Winter,Luxury,Busy
+c037,Seoul,South Korea,Asia,City,Fall|Spring|Summer|Winter,Budget Friendly,Quiet
+c038,Tokyo,Japan,Asia,City,Fall|Spring|Summer|Winter,Luxury,Busy
+c039,Kyoto,Japan,Asia,City|Historical,Fall|Spring|Summer|Winter,Mid-Range,Moderate
+c040,Osaka,Japan,Asia,City,Fall|Spring|Summer|Winter,Luxury,Busy
+c041,Beijing,China,Asia,City,Fall|Spring|Summer|Winter,Mid-Range,Busy
+c042,Shanghai,China,Asia,City,Fall|Spring|Summer|Winter,Mid-Range,Busy
+c043,Hong Kong,China,Asia,City,Fall|Spring|Summer|Winter,Mid-Range,Busy
+c044,Manila,Philippines,Asia,Beach|City,Fall|Spring|Summer|Winter,Mid-Range,Moderate
+c045,Sydney,Australia,Oceania,Adventure|Beach|City|Nature,Fall|Spring|Summer|Winter,Luxury,Moderate
+c046,Melbourne,Australia,Oceania,Adventure|Beach|City|Nature,Fall|Spring|Summer|Winter,Mid-Range,Moderate
+c047,Auckland,New Zealand,Oceania,Adventure|Beach|City|Nature,Fall|Spring|Summer|Winter,Luxury,Moderate
+c048,Honolulu,United States (Hawaii),Oceania,Adventure|Beach|City|Nature,Fall|Spring|Summer|Winter,Budget Friendly,Busy
+c049,Reykjavik,Iceland,Europe,Adventure|City|Nature,Fall|Spring|Summer,Mid-Range,Quiet
+c050,Athens,Greece,Europe,Beach|City|Historical,Fall|Spring|Summer,Budget Friendly,Quiet
+c051,Budapest,Hungary,Europe,City,Fall|Spring|Summer,Mid-Range,Busy
+c052,Warsaw,Poland,Europe,City,Fall|Spring|Summer,Mid-Range,Quiet
+c053,Zurich,Switzerland,Europe,City,Fall|Spring|Summer,Luxury,Busy
+c054,Geneva,Switzerland,Europe,City,Fall|Spring|Summer,Premium,Busy
+c055,Edinburgh,United Kingdom,Europe,City,Fall|Spring|Summer,Luxury,Quiet
+c056,Venice,Italy,Europe,City|Historical,Fall|Spring|Summer,Mid-Range,Moderate
+c057,Florence,Italy,Europe,City|Historical,Fall|Spring|Summer,Mid-Range,Moderate
+c058,Santorini,Greece,Europe,Beach|City|Historical,Fall|Spring|Summer,Mid-Range,Quiet
+c059,Dubrovnik,Croatia,Europe,City,Fall|Spring|Summer,Mid-Range,Moderate
+c060,Grenada,Grenada,Caribbean,Beach|City,Fall|Spring|Summer|Winter,Luxury,Busy
+c061,Havana,Cuba,Caribbean,Beach|City,Fall|Spring|Summer|Winter,Mid-Range,Moderate
+c062,Kingston,Jamaica,Caribbean,Beach|City,Fall|Spring|Summer|Winter,Budget Friendly,Busy
+c063,San Juan,Puerto Rico,Caribbean,Beach|City,Fall|Spring|Summer|Winter,Luxury,Moderate
+c064,Queenstown,New Zealand,Oceania,Adventure|Beach|City|Nature,Fall|Spring|Summer|Winter,Mid-Range,Moderate
+c065,Cusco,Peru,South America,Adventure|City|Historical|Nature,Fall|Spring|Summer,Budget Friendly,Busy
+c066,Cartagena,Colombia,South America,Adventure|City|Historical|Nature,Fall|Spring|Summer,Mid-Range,Busy
+c067,Valparaiso,Chile,South America,Adventure|Beach|City|Nature,Fall|Spring|Summer,Mid-Range,Quiet
+c068,Lyon,France,Europe,City,Fall|Spring|Summer,Mid-Range,Quiet
+c069,Seville,Spain,Europe,Beach|City,Fall|Spring|Summer,Luxury,Busy
+c070,Bali (Denpasar),Indonesia,Asia,Beach|City,Fall|Spring|Summer|Winter,Luxury,Moderate
+c071,Ubud,Indonesia,Asia,Beach|City,Fall|Spring|Summer|Winter,Budget Friendly,Busy
+c072,Agra,India,Asia,City|Historical|Religious,Fall|Spring|Summer|Winter,Luxury,Quiet
+c073,Varanasi,India,Asia,City|Historical|Religious,Fall|Spring|Summer|Winter,Mid-Range,Quiet
+c074,Amman,Jordan,Asia,City|Historical|Religious,Fall|Spring|Summer|Winter,Mid-Range,Busy
+c075,Petra,Jordan,Asia,City|Historical|Religious,Fall|Spring|Summer|Winter,Budget Friendly,Moderate
+c076,Marrakesh,Morocco,Africa,Adventure|City|Historical|Nature,Fall|Spring|Summer|Winter,Mid-Range,Moderate
+c077,Zanzibar,Tanzania,Africa,Adventure|Beach|City|Nature,Fall|Spring|Summer|Winter,Luxury,Moderate
+c078,Fes,Morocco,Africa,Adventure|City|Nature,Fall|Spring|Summer|Winter,Budget Friendly,Moderate
+c079,Lagos,Nigeria,Africa,Adventure|City|Historical|Nature,Fall|Spring|Summer|Winter,Mid-Range,Moderate
+c080,Accra,Ghana,Africa,Adventure|City|Nature,Fall|Spring|Summer|Winter,Mid-Range,Busy
+c081,Tallinn,Estonia,Europe,City,Fall|Spring|Summer,Mid-Range,Moderate
+c082,Vilnius,Lithuania,Europe,City,Fall|Spring|Summer,Mid-Range,Quiet
+c083,Krakow,Poland,Europe,City,Fall|Spring|Summer,Budget Friendly,Moderate
+c084,Santiago,Chile,South America,Adventure|City|Historical|Nature,Fall|Spring|Summer,Mid-Range,Moderate
+c085,Montevideo,Uruguay,South America,Adventure|City|Nature,Fall|Spring|Summer,Budget Friendly,Quiet
+c086,Belfast,United Kingdom,Europe,City,Fall|Spring|Summer,Mid-Range,Moderate
