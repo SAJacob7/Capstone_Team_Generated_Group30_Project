@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+import json
 
 app = Flask(__name__)
 
@@ -78,6 +79,17 @@ def recommend():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route("/metadata")
+def metadata():
+    with open("label_mappings.json") as f:
+        label_mappings = json.load(f)
+    with open("vacation_types.json") as f:
+        vacation_types = json.load(f)
+    return jsonify({
+        "label_mappings": label_mappings,
+        "vacation_types": vacation_types
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)
