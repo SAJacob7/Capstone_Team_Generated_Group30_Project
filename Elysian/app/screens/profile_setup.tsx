@@ -26,7 +26,6 @@ type ProfileSetUpScreenProp = NativeStackNavigationProp<RootParamList, 'ProfileS
 // Profile Setup component
 const ProfileSetup = () => {
   // Initialize navigation with type safety
-  // test
   const navigation = useNavigation<ProfileSetUpScreenProp>();
 
   // List of questions for user
