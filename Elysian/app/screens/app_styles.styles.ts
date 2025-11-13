@@ -6,7 +6,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
     paddingHorizontal: 20,
-    backgroundColor: '#FFFFFF'
+    backgroundColor: '#FFFFFF',
   },
 
   title: {
@@ -19,7 +19,7 @@ export const styles = StyleSheet.create({
   subtext: {
     marginBottom: 24,
     textAlign: 'center',
-    color: "#7D848D"
+    color: '#7D848D',
   },
 
   input: {
@@ -41,17 +41,17 @@ export const styles = StyleSheet.create({
   buttonLabel: {
     fontSize: 18,
     textAlign: 'center',
-    fontWeight: "bold"
+    fontWeight: 'bold',
   },
 
   signupContainer: {
     marginTop: 30,
-    alignItems: "center",
+    alignItems: 'center',
   },
 
   signupLink: {
-    color: "#95CD00",
-    fontWeight: "600",
+    color: '#95CD00',
+    fontWeight: '600',
   },
 
   image: {
@@ -65,7 +65,6 @@ export const styles = StyleSheet.create({
     flexWrap: 'wrap',
     rowGap: 10, // Minimal vertical spacing
     columnGap: 10, // Consistent spacing between columns (if RN 0.71+)
-
   },
 
   answerButton: {
@@ -110,6 +109,97 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
 
+  globeLoaderContainer: {
+    marginTop: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  
+  // --- HOME / RECOMMENDATIONS SCREEN STYLES ---
+
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+
+  homeContainer: {
+    flexGrow: 1,
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 40,
+  },
+
+  homeTitle: {
+    textAlign: 'center',
+    fontWeight: '800',
+    fontSize: 28,
+    lineHeight: 34,
+    color: '#008CFF',
+    marginBottom: 24,
+  },
+
+  recommendButton: {
+    alignSelf: 'center',
+    width: '100%',
+    borderRadius: 999,
+    paddingVertical: 8,
+    marginBottom: 24,
+    backgroundColor: '#6540D8',
+  },
+
+  recommendButtonLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+  loader: {
+    marginTop: 20,
+  },
+
+  resultsContainer: {
+    marginTop: 8,
+  },
+
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 12,
+    color: '#1B1E28',
+  },
+
+  cityCard: {
+    marginBottom: 18,
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: '#F7F4FF',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+  },
+
+  cityImagePlaceholder: {
+    height: 140,
+    backgroundColor: '#E2DDFF',
+  },
+
+  cityInfo: {
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+
+  cityName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#222',
+    marginBottom: 4,
+  },
+
+  cityScore: {
+    fontSize: 13,
+    color: '#666',
+  },
 });
 
 export const inputTheme = {
