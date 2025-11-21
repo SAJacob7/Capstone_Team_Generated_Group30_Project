@@ -6,13 +6,13 @@ Function: This is the Sign Up screen component for the app that allows users to 
 import { View, Alert } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import React, { useState, useEffect } from 'react';
-import { FIREBASE_AUTH } from '../../FirebaseConfig';
+import { FIREBASE_AUTH, FIREBASE_DB } from '../../FirebaseConfig';
 import { styles, inputTheme } from './app_styles.styles';
-import { 
-  createUserWithEmailAndPassword,
-} from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { updateProfile } from 'firebase/auth'; 
+import { doc, setDoc } from 'firebase/firestore'; 
 
 // Define the navigation parameter list
 export type RootParamList = {
@@ -53,11 +53,16 @@ const SignUp = () => {
       // Create new user with email and password in Firebase
       const userCredential = await createUserWithEmailAndPassword(FIREBASE_AUTH, email, password);
       const user = userCredential.user;
+      await updateProfile(user, { displayName: name });
+      await setDoc(doc(FIREBASE_DB, 'users', user.uid), {
+        username: username,
+        createdAt: new Date(),
+      });
 
       // Below line should remember user name in session, but not sure if working.
       // await updateProfile(user, { displayName: name });
 
-
+      
       navigation.push('ProfileLanding'); // Navigate to Profile Setup page once acccount is created
     } catch (error: any) {
       Alert.alert("Sign Up Failed", error.message);

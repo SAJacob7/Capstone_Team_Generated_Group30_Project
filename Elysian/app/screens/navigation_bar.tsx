@@ -23,8 +23,8 @@ export default function NavigationBar() {
   // Dictionary to map page screens to icon names from Ionicons. https://ionic.io/ionicons
   const icons: { [key: string]: string } = { 
     Home: "home-outline",
-    Profile: "heart-circle-outline",
-    Profile1: "person-circle-outline", // Update
+    //Profile: "heart-circle-outline",
+    Profile: "person-circle-outline", 
     };
     
     return (
@@ -41,8 +41,6 @@ export default function NavigationBar() {
       {/* Define individual tab pages */}
       <Tab.Screen name="Home" component={Home} /> 
       <Tab.Screen name="Profile" component={Profile} />
-      {/* Update */}
-      <Tab.Screen name="Profile1" component={Profile} /> 
     </Tab.Navigator>
   );
 }
