@@ -35,7 +35,7 @@ const ProfileLanding = () => {
         useNativeDriver: true,
       }).start(() => {
         // Navigate to Login screen after fading out
-        navigation.push('ProfileSetup');
+        navigation.replace('ProfileSetup');
       });
     }, 500); // Delay duration before starting fade out animation
 

@@ -4,19 +4,29 @@ Function: This is the Home screen component for the app where the recommendation
 */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { View, ScrollView, ActivityIndicator, SafeAreaView } from 'react-native';
+import { View, ScrollView, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Button, Card} from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { styles } from './app_styles.styles';
 import { Animated, Easing } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { getAuth } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { FIREBASE_DB } from '../../FirebaseConfig';
 
 
 // Define the navigation parameter list
 export type RootParamList = {
   Home: undefined;
 };
+interface Recommendation {
+  city_id: string;
+  city_name: string;
+  country: string;
+  score: number;
+}
 
 // Define the type for Home screen navigation prop
 type HomeScreenProp = NativeStackNavigationProp<RootParamList, 'Home'>;
@@ -58,124 +68,41 @@ const Home = () => {
   // Initialize navigation with type safety
   const navigation = useNavigation<HomeScreenProp>();
   const [loading, setLoading] = useState(false);
-  const [recommendations, setRecommendations] = useState<any[]>([]);
-  const [labelMappings, setLabelMappings] = useState<Record<string, string[]>>({});
-  const [vacationTypes, setVacationTypes] = useState<string[]>([]);
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  // Fetch label mappings dynamically from backend
+  // Load recommendations from Firestore
   useEffect(() => {
-    const loadMappings = async () => {
+    const loadRecommendations = async () => {
+      setLoading(true);
       try {
-        const response = await fetch('https://capstone-team-generated-group30-project.onrender.com/metadata');
-        const data = await response.json();
-        setLabelMappings(data.label_mappings);
-        setVacationTypes(data.vacation_types);
+        const auth = getAuth();
+        const user = auth.currentUser;
+        if (!user) {
+          setError('No user signed in.');
+          setLoading(false);
+          return;
+        }
+
+        const userRecRef = doc(FIREBASE_DB, 'userRec', user.uid);
+        const snapshot = await getDoc(userRecRef);
+
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          setRecommendations(data.gen_recommendations || []);
+        } else {
+          setError('No recommendations found. Please complete your profile setup.');
+        }
       } catch (err) {
-        console.error('Error loading label mappings:', err);
+        console.error('Error loading recommendations:', err);
+        setError('Failed to load recommendations.');
+      } finally {
+        setLoading(false);
       }
     };
-    loadMappings();
+
+    loadRecommendations();
   }, []);
-
-  // Encoding function
-  const encodeUserInput = (userInput: Record<string, string>) => {
-    const categoricalFeatures = [
-      'origin_country',
-      'seasons',
-      'budget',
-      'favorite_country_visited',
-      'travel_distance',
-      'place_type',
-    ];
-
-    //This encodes it into categorical features
-    const userCatEncoded = categoricalFeatures.map((feature) => {
-      const classes = labelMappings[feature];
-      const value = userInput[feature] ?? '';
-      if (classes && classes.includes(value)) {
-        return classes.indexOf(value);
-      } else {
-        console.warn(`Unseen label '${value}' for feature '${feature}'`);
-        return -1;
-      }
-    });
-
-    //This encodes the vacation features
-    const userVacationEncoded = new Array(vacationTypes.length).fill(0);
-    if (userInput.vacation_types) {
-      const vacationList = userInput.vacation_types.split('|');
-      vacationList.forEach((vt) => {
-        const idx = vacationTypes.indexOf(vt);
-        if (idx >= 0) userVacationEncoded[idx] = 1;
-      });
-    }
-
-    return { categorical: userCatEncoded, vacationTypes: userVacationEncoded };
-  };
-
-  // Create fake users for testing
-  const fakeUsers = [
-    {
-      name: 'Budget Backpacker',
-      origin_country: 'Mexico',
-      seasons: 'Summer',
-      budget: 'Low',
-      favorite_country_visited: 'USA',
-      travel_distance: 'Medium',
-      place_type: 'City',
-      vacation_types: 'Adventure|Nature',
-    },
-    {
-      name: 'Luxury Traveler',
-      origin_country: 'Germany',
-      seasons: 'Winter',
-      budget: 'High',
-      favorite_country_visited: 'France',
-      travel_distance: 'Long',
-      place_type: 'Beach',
-      vacation_types: 'Relaxation|Culture|Shopping',
-    },
-    {
-      name: 'Nature Lover',
-      origin_country: 'Canada',
-      seasons: 'Spring',
-      budget: 'Mid',
-      favorite_country_visited: 'Japan',
-      travel_distance: 'Long',
-      place_type: 'Mountains',
-      vacation_types: 'Adventure|Nature|Relaxation',
-    },
-  ];
-
-  // Pick one fake user for demonstration
-  const userInput = fakeUsers[2]; // Change index to test different users
-  // This function calls to the API with the tokenized user input to get the recommendations.
-  const fetchRecommendations = async () => {
-    
-    if (!Object.keys(labelMappings).length) {
-      console.error('Encoders not loaded yet');
-      return;
-    }
-    
-    setLoading(true); // Show a loading screen waiting for the recommendations.
-    try { // First, we will fetch the recommendations hosted page and then post the vectorized input data for the specific user.
-      const encoded = encodeUserInput(userInput);
-      const queryVector = [...encoded.categorical, ...encoded.vacationTypes];
-
-      const response = await fetch('https://capstone-team-generated-group30-project.onrender.com/recommend', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query_vector: queryVector })
-      });
-
-      const data = await response.json(); // Once we have given the data, it will run the hosted app.py to generate recommendations from the model.
-      setRecommendations(data.recommendations || []); // Get the recommendations, otherwise return empty.
-    } catch (error) {
-      console.error('Error fetching recommendations:', error);
-    } finally {
-      setLoading(false); // Once recommendations are received, we can stop the loading screen.
-    }
-  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -185,29 +112,27 @@ const Home = () => {
         <Text variant="headlineLarge" style={styles.homeTitle}>
           Your Adventure{'\n'}Starts Here!
         </Text>
-  
-        {/* Button */}
-        <Button
-          mode="contained"
-          onPress={fetchRecommendations}
-          style={styles.recommendButton}
-          labelStyle={styles.recommendButtonLabel}
-        >
-          Get Recommendations
-        </Button>
-  
-        {loading && <GlobeLoader />}
-  
+
+        {/* Loading */}
+        {loading && (
+          <Text style={styles.sectionTitle}>Loading recommendations...</Text>
+        )}
+
+        {/* Error */}
+        {error && !loading && (
+          <Text>{error}</Text>
+        )}
+
         {/* Recommendations */}
         {recommendations.length > 0 && !loading && (
           <View style={styles.resultsContainer}>
             <Text style={styles.sectionTitle}>Top Cities:</Text>
-  
+            
             {recommendations.map((city) => (
               <Card key={city.city_id} style={styles.cityCard}>
                 {/* Placeholder “image” block */}
                 <View style={styles.cityImagePlaceholder} />
-  
+
                 {/* Text section */}
                 <View style={styles.cityInfo}>
                   <Text style={styles.cityName}>
@@ -221,7 +146,6 @@ const Home = () => {
             ))}
           </View>
         )}
-  
       </ScrollView>
     </SafeAreaView>
   )};

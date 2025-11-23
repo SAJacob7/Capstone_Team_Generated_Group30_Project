@@ -63,7 +63,7 @@ const SignUp = () => {
       // await updateProfile(user, { displayName: name });
 
       
-      navigation.push('ProfileLanding'); // Navigate to Profile Setup page once acccount is created
+      navigation.replace('ProfileLanding'); // Navigate to Profile Setup page once acccount is created
     } catch (error: any) {
       Alert.alert("Sign Up Failed", error.message);
     } finally {
