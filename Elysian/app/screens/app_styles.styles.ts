@@ -162,24 +162,34 @@ export const styles = StyleSheet.create({
 
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
     marginBottom: 12,
     color: '#1B1E28',
   },
 
   cityCard: {
     marginBottom: 18,
-    borderRadius: 20,
-    overflow: 'hidden',
+    borderRadius: 20, // Rounded corners
     backgroundColor: '#F7F4FF',
-    elevation: 2,
-    shadowColor: '#000',
+    elevation: 2,  // Shadow for Android
+    shadowColor: '#000', // Shadow for iOS
     shadowOpacity: 0.08,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 6,
   },
 
+  cityCardInner: {
+    borderRadius: 20, // Clips content for rounded edges
+    overflow: 'hidden', // Keeps image within rounded corners
+  },
+
+  cityImage: {
+    width: '100%',
+    height: 140,
+  },
+
   cityImagePlaceholder: {
+    width: '100%',
     height: 140,
     backgroundColor: '#E2DDFF',
   },
@@ -200,6 +210,7 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     color: '#666',
   },
+
 });
 
 export const inputTheme = {

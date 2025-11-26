@@ -4,7 +4,7 @@ Function: This is the Home screen component for the app where the recommendation
 */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { View, ScrollView, ActivityIndicator } from 'react-native';
+import { View, ScrollView, ActivityIndicator, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Button, Card} from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
@@ -26,6 +26,8 @@ interface Recommendation {
   city_name: string;
   country: string;
   score: number;
+  description?: string;
+  image?: string;
 }
 
 // Define the type for Home screen navigation prop
@@ -71,6 +73,27 @@ const Home = () => {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchCityInfo = async (cityName: string, country: string) => {
+    try {
+      const query = `${cityName}, ${country}`;
+      const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
+
+      const res = await fetch(url);
+      const data = await res.json();
+
+      return {
+        description: data.extract || 'No description available.',
+        image: data.thumbnail?.source || undefined,
+      };
+    } catch (err) {
+      console.error('Error fetching city info:', err);
+      return {
+        description: 'No description available.',
+        image: undefined,
+      };
+    }
+  };
+
   // Load recommendations from Firestore
   useEffect(() => {
     const loadRecommendations = async () => {
@@ -89,10 +112,20 @@ const Home = () => {
 
         if (snapshot.exists()) {
           const data = snapshot.data();
-          setRecommendations(data.gen_recommendations || []);
+          const recs: Recommendation[] = data.gen_recommendations || [];
+
+          const enrichedRecs = await Promise.all(
+            recs.map(async (city) => {
+              const extra = await fetchCityInfo(city.city_name, city.country);
+              return { ...city, ...extra };
+            })
+          );
+          
+          setRecommendations(enrichedRecs);
         } else {
           setError('No recommendations found. Please complete your profile setup.');
         }
+
       } catch (err) {
         console.error('Error loading recommendations:', err);
         setError('Failed to load recommendations.');
@@ -130,23 +163,33 @@ const Home = () => {
             
             {recommendations.map((city) => (
               <Card key={city.city_id} style={styles.cityCard}>
-                {/* Placeholder “image” block */}
-                <View style={styles.cityImagePlaceholder} />
+                {/* Inner wrapper handles rounding without clipping shadow */}
+                <View style={styles.cityCardInner}>
+                  {/* City image */}
+                  {city.image ? (
+                    <Image
+                      source={{ uri: city.image }}
+                      style={styles.cityImage}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <View style={styles.cityImagePlaceholder} />
+                  )}
 
-                {/* Text section */}
-                <View style={styles.cityInfo}>
-                  <Text style={styles.cityName}>
-                    {city.city_name}, {city.country}
-                  </Text>
-                  <Text style={styles.cityScore}>
-                    Score: {city.score.toFixed(2)}
-                  </Text>
+                  {/* Text section */}
+                  <View style={styles.cityInfo}>
+                    <Text style={styles.cityName}>
+                      {city.city_name}, {city.country}
+                    </Text>
+                  </View>
                 </View>
               </Card>
             ))}
+
           </View>
         )}
       </ScrollView>
     </SafeAreaView>
-  )};
+  );
+};
 export default Home;
