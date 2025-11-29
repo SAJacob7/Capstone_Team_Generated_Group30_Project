@@ -1,4 +1,8 @@
 # Capstone_Team_Generated_Group30_Project
+**[Video Presentation - Fall 2025](https://kansas-my.sharepoint.com/:v:/g/personal/s021j917_home_ku_edu/IQDSfADo-SL5Tb7w6MJVB3WSAS9JWf0e7ODU49CKIdhRGug?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&e=aMOwqM)**
+
+**[Presentation Slides - Fall 2025](https://www.canva.com/design/DAG50RNpmdA/39v-xmx_V2grBJZl6ADDzg/edit?utm_content=DAG50RNpmdA&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)**
+
 **[Completed Figma](https://www.figma.com/design/OkqvVBkwqOT3h5tQEhQQqs/Travel-App-Design--Community-?node-id=0-1&t=4qjgrWaNNDilgRgQ-1)**
 ## GitHub Structure
 1. **Elysian Directory** - This is where our code for our app is kept. You can download the repo to see the code in this directory or view on GitHub.
