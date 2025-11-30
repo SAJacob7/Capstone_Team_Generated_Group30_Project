@@ -10,6 +10,7 @@ Welcome to our Elysian GitHub page! We have all our documents, code, and more ho
 What is **Elysian**? It is an AI-powered travel app, where you can “find your paradise!” The idea of this app stemmed from our shared frustration in planning our trips. We often didn’t know where to start or what were potential destinations that would suit our needs, causing a time-consuming and overwhelming experience. The existing solutions on the market only provide generic recommendations without personalization, making it hard to find places that match our needs.
 So that's why we’re Introducing Elysian! Elysian is a mobile app that helps you discover travel destinations that actually match your preferences, using our very own trained model called Soleil AI. It’s quite easy to get started. Just create a simple profile in the app and see your recommendations come to life based on your interests, budget, and travel style.
 <br>
+
 **Team Members - Group 30**
 - Sophia Jacob
 - Anna Lin
@@ -40,3 +41,14 @@ Reference them here:
 - [Sprint 3](https://github.com/users/SAJacob7/projects/8)
 - [Final Sprint](https://github.com/users/SAJacob7/projects/9/views/1)
 - [**Meeting Logs**](https://github.com/SAJacob7/Capstone_Team_Generated_Group30_Project/wiki)
+
+# User Manual
+Start by cloning this GitHub repo as seen below.
+```
+  git clone https://github.com/SAJacob7/Capstone_Team_Generated_Group30_Project.git
+```
+After ensuring you have all the required modules and dependencies, run the app by doing:
+```
+  npx expo start
+```
+Then, click i for an iOS phone.
