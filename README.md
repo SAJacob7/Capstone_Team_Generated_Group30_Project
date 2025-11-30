@@ -47,6 +47,10 @@ Start by cloning this GitHub repo as seen below.
 ```
   git clone https://github.com/SAJacob7/Capstone_Team_Generated_Group30_Project.git
 ```
+Install the modules by doing:
+```
+  pip3 install -r requirements.txt
+```
 After ensuring you have all the required modules and dependencies, run the app by doing:
 ```
   npx expo start
