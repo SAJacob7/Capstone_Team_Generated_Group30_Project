@@ -35,7 +35,6 @@ const ProfileSetup = () => {
     {question: "What seasons do you like?", answer: ["Spring", "Summer", "Fall", "Winter"]},
     {question: "What is your budget?", answer: ["Budget Friendly", "Mid-Range", "Luxury", "Premium"]},
     {question: "What has been your favorite country you've visted?", answer: []},
-    {question: "How far do you want to travel?", answer: ["Within your Country", "Within your Continent", "Outside of your Continent", "Anywhere"]},
     {question: "What type of place do you like?", answer: ["Quiet", "Moderate", "Busy"]},
   ];
 
