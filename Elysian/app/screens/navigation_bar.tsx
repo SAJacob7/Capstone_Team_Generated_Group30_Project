@@ -7,11 +7,15 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { inputTheme } from './app_styles.styles';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Home from './home';
+import Recommendations from './recommendations';
+import Likes from './likes';
 import Profile from './profile';
 
 // Define the navigation parameter list
 export type RootTabParamList = {
   Home: undefined;
+  Recommendations: undefined;
+  Likes: undefined;
   Profile: undefined;
 };
 
@@ -22,6 +26,8 @@ export default function NavigationBar() {
   // Dictionary to map page screens to icon names from Ionicons. https://ionic.io/ionicons
   const icons: { [key: string]: string } = { 
     Home: "home-outline",
+    Recommendations: "airplane-outline",
+    Likes: 'heart-circle-outline',
     Profile: "person-circle-outline", 
     };
     
@@ -38,6 +44,8 @@ export default function NavigationBar() {
     >
       {/* Define individual tab pages */}
       <Tab.Screen name="Home" component={Home} /> 
+      <Tab.Screen name="Recommendations" component={Recommendations} /> 
+      <Tab.Screen name="Likes" component={Likes} /> 
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
   );
