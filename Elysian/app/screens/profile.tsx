@@ -55,7 +55,7 @@ const Profile = () => {
             setResponses(profileDoc.data()?.responses || {});
           }
         } else {
-          navigation.replace('Login');
+          navigation.push('Login');
         }
       };
 

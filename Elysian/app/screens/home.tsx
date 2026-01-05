@@ -123,7 +123,7 @@ const Home = () => {
           
           setRecommendations(enrichedRecs);
         } else {
-          setError('No recommendations found. Please complete your profile setup.');
+          setError('No recommendations found. Please complete your profile setup.'); // Change to some loading screen
         }
 
       } catch (err) {

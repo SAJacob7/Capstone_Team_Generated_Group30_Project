@@ -254,9 +254,23 @@ const ProfileSetup = () => {
         ...responses, [currentQuestionIndex]: isAutocomplete ? typedAnswer : chosenAnswers[currentQuestionIndex],
       }
       handleSubmit(finalResponses);
-      fetchRecommendations(finalResponses); // Get the recommendations.
       console.log("All User Responses: ", responses); // Print response
-      navigation.replace("NavigationBar"); // Navigate to NavigationBar once user is done with questions
+
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (!user) {
+        alert('Error, User must be signed in!');
+        return;
+      }
+
+      setDoc(
+        doc(FIREBASE_DB, 'users', user.uid),
+        { accountCreationComplete: true },
+        { merge: true }
+      );
+
+      fetchRecommendations(finalResponses); // Get the recommendations.
     }
   };
 

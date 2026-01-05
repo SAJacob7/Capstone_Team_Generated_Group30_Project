@@ -57,31 +57,18 @@ const SignUp = () => {
       await setDoc(doc(FIREBASE_DB, 'users', user.uid), {
         username: username,
         createdAt: new Date(),
+        accountCreationComplete: false,
       });
 
       // Below line should remember user name in session, but not sure if working.
       // await updateProfile(user, { displayName: name });
 
-      
-      navigation.replace('ProfileLanding'); // Navigate to Profile Setup page once acccount is created
     } catch (error: any) {
       Alert.alert("Sign Up Failed", error.message);
     } finally {
       setLoading(false);
     }
   };
-
-  // Commented out for now, because it doesn't work fully.
-  // Auto-login / session persistence
-  // useEffect(() => {
-  //   const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (currentUser) => {
-  //     if (currentUser) {
-  //       navigation.replace('home'); // Navigate to Home if already logged in
-  //     }
-  //   });
-
-  //   return () => unsubscribe();
-  // }, []);
 
   // Handle navigation to Login screen
   const goToSignIn = async () => {

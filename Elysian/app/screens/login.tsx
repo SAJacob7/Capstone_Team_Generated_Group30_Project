@@ -6,7 +6,8 @@ Function: This is the Login screen component for the app that displays the app l
 import { View, Alert } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import React, { useState, useEffect } from 'react';
-import { FIREBASE_AUTH } from '../../FirebaseConfig';
+import { doc, updateDoc } from 'firebase/firestore';
+import { FIREBASE_AUTH, FIREBASE_DB } from '../../FirebaseConfig';
 import { styles, inputTheme } from './app_styles.styles';
 import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
 import { useNavigation } from '@react-navigation/native';
@@ -33,17 +34,6 @@ const Login = () => {
   // Initialize navigation with type safety
   const navigation = useNavigation<LoginScreenProp>();
 
-  // Auto-login / session persistence
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (currentUser) => {
-      if (currentUser) {
-        navigation.replace('NavigationBar'); // Navigate to NavigationBar if user is already logged in
-      }
-    });
-
-    return () => unsubscribe(); // Cleanup subscription on unmount
-  }, []);
-
   // Handles user sign in 
   const signIn = async () => {
     setLoading(true);
@@ -54,9 +44,13 @@ const Login = () => {
         email.trim(),
         password.trim()
       );
-      console.log('Signed in user:', response.user);
-      Alert.alert('Success', `Welcome back, ${response.user.email}`);
-      navigation.replace('NavigationBar');
+      const user = response.user;
+      await updateDoc(doc(FIREBASE_DB, 'users', user.uid), {
+        accountCreationComplete: true,
+      });
+
+      console.log('Signed in user:', user);
+      Alert.alert('Success', `Welcome back, ${user.email}`);
     } catch (error: any) {
       console.log('Sign-in error:', error.code, error.message);
       Alert.alert('Sign-in Failed', error.message);
