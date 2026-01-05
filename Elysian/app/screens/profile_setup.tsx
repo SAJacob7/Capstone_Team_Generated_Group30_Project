@@ -4,7 +4,7 @@ Function: This is the Profile Setup screen component for the app. Users answer q
 */
 
 import { useEffect, useState } from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, ScrollView } from 'react-native';
 import { TextInput, Button, Text, } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -30,23 +30,40 @@ const ProfileSetup = () => {
   const navigation = useNavigation<ProfileSetUpScreenProp>();
 
   // List of questions for user
-  const questions = [{question: "Where are you traveling from?", answer: []},
+  const questions = [{question: "Where are you traveling from?", answer: ["Argentina", "Australia", "Brazil", "Canada", "Chile", "China", 
+                                                                          "Colombia", "Croatia", "Cuba", "Czech Republic", "Egypt", "Estonia",
+                                                                          "France", "Germany", "Ghana", "Greece", "Grenada", "Hungary", "Iceland",
+                                                                          "India", "Indonesia", "Italy", "Jamaica", "Japan", "Jordan", "Kenya", "Lithuania",
+                                                                          "Malaysia", "Mexico", "Morocco", "Netherlands", "New Zealand", "Nigeria", "Peru",
+                                                                          "Philippines", "Poland", "Portugal", "Puerto Rico", "Qatar", "Russia", "Saudi Arabia",
+                                                                          "Singapore", "South Africa", "South Korea", "Spain", "Switzerland", "Tanzania", "Thailand",
+                                                                          "Turkey", "United Arab Emirates", "United Kingdom", "United States", "United States (Hawaii)",
+                                                                          "Uruguay", "Vietnam"]},
     {question: "What type of vacation are you looking for?", answer: ["Beach", "City", "Historical", "Adventure", "Nature", "Religious"]},
     {question: "What seasons do you like?", answer: ["Spring", "Summer", "Fall", "Winter"]},
     {question: "What is your budget?", answer: ["Budget Friendly", "Mid-Range", "Luxury", "Premium"]},
-    {question: "What has been your favorite country you've visted?", answer: []},
+    {question: "What has been your favorite country you've visted?", answer: ["Argentina", "Australia", "Brazil", "Canada",
+                                                                              "Chile", "China", "Colombia", "Croatia", "Cuba", "Czech Republic",
+                                                                              "Egypt", "Estonia", "France", "Germany", "Ghana", "Greece", "Grenada",
+                                                                              "Hungary", "Iceland", "India", "Indonesia", "Italy", "Jamaica", "Japan",
+                                                                              "Jordan", "Kenya", "Lithuania", "Malaysia", "Mexico", "Morocco", "Netherlands",
+                                                                              "New Zealand", "Nigeria", "Peru", "Philippines", "Poland", "Portugal", "Puerto Rico",
+                                                                              "Qatar", "Russia", "Saudi Arabia", "Singapore", "South Africa", "South Korea", "Spain",
+                                                                              "Switzerland", "Tanzania", "Thailand", "Turkey", "United Arab Emirates", "United Kingdom",
+                                                                              "United States", "United States (Hawaii)", "Uruguay", "Vietnam", "nan"]},
     {question: "What type of place do you like?", answer: ["Quiet", "Moderate", "Busy"]},
   ];
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // Stores the index of the current question
   const [chosenAnswers, setChosenAnswers] = useState<{ [key: number]: string[] }>({}); // Stores the choosen answer for each multi-select questions
-  const [typedAnswer, setTypedAnswer] = useState(""); // Stores the typed answer for the short answer questions 
-  const [responses, setResponses] = useState<{ [key: number]: string[] | string }>({}); // Stores all the responses the user has made (typed + multiple choice)
+  const [typedAnswer, setTypedAnswer] = useState(""); // Stores the typed answer for the drop down.
+  const [responses, setResponses] = useState<{ [key: number]: string[] | string }>({}); // Stores all the responses the user has made (dropdown + multiple choice)
   const [loading, setLoading] = useState(false);
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [labelMappings, setLabelMappings] = useState<Record<string, string[]>>({});
   const [vacationTypes, setVacationTypes] = useState<string[]>([]);
-  
+  const [dropdownOpen, setDropdownOpen] = useState(false); // Stores whether to open the drop down if the user has typed or not.
+
   // Fetch label mappings dynamically from backend
   useEffect(() => {
     const loadMappings = async () => {
@@ -63,7 +80,8 @@ const ProfileSetup = () => {
   }, []);
 
   const currentQuestion = questions[currentQuestionIndex]; // Sets the current question based on current inde
-  const isShortAnswer = currentQuestion.answer.length === 0; // If there is no answers to display, it is a short answer question; otherwise, it's multi-select
+  // const isShortAnswer = currentQuestion.answer.length === 0; // If there is no answers to display, it is a short answer question; otherwise, it's multi-select
+  const isAutocomplete = currentQuestion.answer.length > 0 && (currentQuestionIndex === 0 || currentQuestionIndex === 4); // These are the questions that have a drop down.
 
   // Count how many previous questions have answer buttons
   const buttonQuestionIndex = questions
@@ -206,20 +224,20 @@ const ProfileSetup = () => {
   // Handles action when next button is selected
   const nextQuestion = () => {
     // Check that there is an answer typed for short answer questions
-    if (isShortAnswer && typedAnswer.trim() === "") {
-      alert("Answer required. Please type an answer.")
+    if (isAutocomplete && typedAnswer.trim() === "") {
+      alert("Answer required. Please select from dropdown.")
       return;
     }
     
     // Check that there is an answer selected for multi-select questions
-    if (!isShortAnswer && (!chosenAnswers[currentQuestionIndex] || chosenAnswers[currentQuestionIndex].length === 0)){
+    if (!isAutocomplete && (!chosenAnswers[currentQuestionIndex] || chosenAnswers[currentQuestionIndex].length === 0)){
       alert("Answer required. Please select an answer.")
       return;
     }
 
     // Now, save the reponse of the user for the current question before going to the next question
     setResponses((current) => ({
-        ...current, [currentQuestionIndex]: isShortAnswer ? typedAnswer : chosenAnswers[currentQuestionIndex],
+        ...current, [currentQuestionIndex]: isAutocomplete ? typedAnswer : chosenAnswers[currentQuestionIndex],
     }));
     
     // Go to the next question after saving the response of the current question
@@ -233,7 +251,7 @@ const ProfileSetup = () => {
     // Navigate to home page
     else {
       const finalResponses = {
-        ...responses, [currentQuestionIndex]: isShortAnswer ? typedAnswer : chosenAnswers[currentQuestionIndex],
+        ...responses, [currentQuestionIndex]: isAutocomplete ? typedAnswer : chosenAnswers[currentQuestionIndex],
       }
       handleSubmit(finalResponses);
       fetchRecommendations(finalResponses); // Get the recommendations.
@@ -248,15 +266,55 @@ const ProfileSetup = () => {
       <Text style={styles.questionText}>{currentQuestion.question}</Text>
 
       {/* If the question is a short answer question, display like this: */}
-      {isShortAnswer ? (
-        <TextInput
-          label="Type Answer: "
-          value={typedAnswer}
-          onChangeText={setTypedAnswer}
-          mode="outlined"
-          style={styles.input}
-          theme={inputTheme}
-        />
+      {isAutocomplete ? (
+        <View style={{ width: "100%" }}>
+          <TextInput
+            label="Start typing..."
+            value={typedAnswer}
+            onChangeText={(text) => {
+              setTypedAnswer(text);
+              setDropdownOpen(true);
+            }}
+            mode="outlined"
+            style={styles.input}
+            theme={inputTheme}
+          />
+
+          {dropdownOpen && typedAnswer.length > 0 && (
+            <View style={{
+              backgroundColor: "white",
+              borderWidth: 1,
+              borderColor: "#ccc",
+              marginTop: 4,
+              maxHeight: 100,
+              borderRadius: 6,
+              overflow: "hidden",
+            }}>
+              <ScrollView>
+                {currentQuestion.answer
+                  .filter((country) =>
+                    country.toLowerCase().includes(typedAnswer.toLowerCase())
+                  )
+                  .map((country, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      onPress={() => {
+                        setTypedAnswer(country);
+                        setDropdownOpen(false);
+                      }}
+                      style={{
+                        padding: 12,
+                        borderBottomWidth: 1,
+                        borderBottomColor: "#eee"
+                      }}
+                    >
+                      <Text>{country}</Text>
+                    </TouchableOpacity>
+                  ))}
+              </ScrollView>
+            </View>
+          )}
+        </View>
       ) : (
       <View style={styles.gridContainer}>
         {currentQuestion.answer.map((answer, index) => {
