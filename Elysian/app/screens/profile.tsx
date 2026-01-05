@@ -20,8 +20,7 @@ const questions = [
   "What type of vacation are you looking for?", 
   "What seasons do you like?",
   "What is your budget?",
-  "What has been your favorite country you've visted?", 
-  "How far do you want to travel?", 
+  "What has been your favorite country you've visted?",
   "What type of place do you like?" 
 ];
 
