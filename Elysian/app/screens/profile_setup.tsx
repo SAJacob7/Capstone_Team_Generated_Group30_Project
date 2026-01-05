@@ -47,6 +47,7 @@ const ProfileSetup = () => {
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [labelMappings, setLabelMappings] = useState<Record<string, string[]>>({});
   const [vacationTypes, setVacationTypes] = useState<string[]>([]);
+  
   // Fetch label mappings dynamically from backend
   useEffect(() => {
     const loadMappings = async () => {
@@ -74,6 +75,7 @@ const ProfileSetup = () => {
   const currentSelectedColor = selectedColors[buttonQuestionIndex % selectedColors.length];
   const normalize = (s: string) =>
     s.toString().trim();
+
   const encodeUserInput = (userInput: Record<string, string>) => {
     const categoricalFeatures = [
       'origin_country',
@@ -113,13 +115,12 @@ const ProfileSetup = () => {
       origin_country: responses[0] as string,
       vacation_types: Array.isArray(responses[1]) ? responses[1].join('|') : responses[1],
       seasons: Array.isArray(responses[2]) ? responses[2].join('|') : responses[2],
-      budget: responses[3] as string,
+      budget: Array.isArray(responses[3]) ? responses[3].join('|') : responses[3],
       favorite_country_visited: responses[4] as string,
       travel_distance: responses[5] as string,
-      place_type: responses[6] as string,
+      place_type: Array.isArray(responses[6]) ? responses[6].join('|') : responses[6],
     };
-  };
-
+  };  
 
   const fetchRecommendations = async (finalResponses: { [key: string]: string[] | string }) => {
     
@@ -199,7 +200,7 @@ const ProfileSetup = () => {
     }
     catch (error) {
       console.error('Encountered an error while saving your answer:', error);
-      alert('Error, There was an werror while saving your answers.')
+      alert('Error, There was an error while saving your answers.')
     }
   };
 
