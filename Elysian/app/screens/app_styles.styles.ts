@@ -211,6 +211,47 @@ export const styles = StyleSheet.create({
     color: '#666',
   },
 
+  // --- CITY INFO MODAL ---
+
+  cityModalContainer: {
+    width: '90%',
+    alignSelf: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 22,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 14,
+    elevation: 6,
+  },  
+
+  cityModalTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#1B1E28',
+    marginBottom: 10,
+  },
+
+  cityModalImage: {
+    width: '100%',
+    height: 180,
+    borderRadius: 16,
+    marginBottom: 12,
+  },
+
+  cityModalDescription: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#333',
+    marginBottom: 14,
+  },
+
+  cityModalCloseBtn: {
+    borderRadius: 999,
+    backgroundColor: '#008CFF',
+  },
+
 });
 
 export const inputTheme = {
