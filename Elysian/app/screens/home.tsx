@@ -4,7 +4,7 @@ Function: This is the Home screen component for the app where the recommendation
 */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { View, ScrollView, ActivityIndicator, Image } from 'react-native';
+import { View, ScrollView, ActivityIndicator, Image, Pressable, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Button, Card} from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
@@ -72,27 +72,102 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [selectedCity, setSelectedCity] = useState<Recommendation | null>(null);
+  const [cityModalOpen, setCityModalOpen] = useState(false);
 
+
+  const fetchWikivoyageIntro = async (
+    cityName: string,
+    country: string
+  ): Promise<string | null> => {
+    const titlesToTry = [
+      cityName,
+      `${cityName}, ${country}`,
+      `${cityName} (${country})`,
+    ];
+  
+    for (const title of titlesToTry) {
+      try {
+        const url =
+          `https://en.wikivoyage.org/w/api.php` +
+          `?action=query&format=json&origin=*` +
+          `&prop=extracts&exintro=1&explaintext=1&redirects=1` +
+          `&titles=${encodeURIComponent(title)}`;
+  
+        const res = await fetch(url);
+        const data = await res.json();
+  
+        const pages = data?.query?.pages;
+        if (!pages) continue;
+  
+        const page = pages[Object.keys(pages)[0]];
+        const extract = page?.extract;
+  
+        if (
+          extract &&
+          !extract.toLowerCase().includes('more than one place') &&
+          !extract.toLowerCase().includes('may refer to')
+        ) {
+          return extract;
+        }
+      } catch {
+        continue;
+      }
+    }
+  
+    return null;
+  };
+  
+  
+  const shorten = (text: string, sentences = 3) => {
+    const cleaned = text.replace(/\s+/g, ' ').trim();
+    if (!cleaned) return '';
+    const parts = cleaned.split('. ');
+    const sliced = parts.slice(0, sentences).join('. ');
+    return sliced.endsWith('.') ? sliced : sliced + '.';
+  };
+  
+  const fetchWikipediaSummary = async (title: string) => {
+    const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    return res.json();
+  };
+
+  const isFlagImage = (url?: string) => {
+    if (!url) return false;
+    const lower = url.toLowerCase();
+    return lower.includes('flag') || lower.includes('flag_of');
+  };  
+  
   const fetchCityInfo = async (cityName: string, country: string) => {
     try {
-      const query = `${cityName}, ${country}`;
-      const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
-
-      const res = await fetch(url);
-      const data = await res.json();
-
-      return {
-        description: data.extract || 'No description available.',
-        image: data.thumbnail?.source || undefined,
-      };
+      // 1) Travel-style text first from Wikivoyage
+      const voyText = await fetchWikivoyageIntro(cityName, country);
+      // 2) Wikipedia fallback
+      let wikiData = await fetchWikipediaSummary(cityName);
+      if (!wikiData) {
+        wikiData = await fetchWikipediaSummary(`${cityName}, ${country}`);
+      }
+  
+      const wikiText: string | null = wikiData?.extract || null;
+      const rawImage =
+        wikiData?.originalimage?.source ||
+        wikiData?.thumbnail?.source;
+        
+      const image = isFlagImage(rawImage) ? undefined : rawImage;
+  
+      const descriptionRaw = voyText || wikiText || '';
+      const description = descriptionRaw
+        ? shorten(descriptionRaw, 3)
+        : 'No description available.';
+  
+      return { description, image };
     } catch (err) {
       console.error('Error fetching city info:', err);
-      return {
-        description: 'No description available.',
-        image: undefined,
-      };
+      return { description: 'No description available.', image: undefined };
     }
-  };
+  };  
 
   // Load recommendations from Firestore
   useEffect(() => {
@@ -162,33 +237,88 @@ const Home = () => {
             <Text style={styles.sectionTitle}>Top Cities:</Text>
             
             {recommendations.map((city) => (
-              <Card key={city.city_id} style={styles.cityCard}>
-                {/* Inner wrapper handles rounding without clipping shadow */}
-                <View style={styles.cityCardInner}>
-                  {/* City image */}
-                  {city.image ? (
-                    <Image
-                      source={{ uri: city.image }}
-                      style={styles.cityImage}
-                      resizeMode="cover"
-                    />
-                  ) : (
-                    <View style={styles.cityImagePlaceholder} />
-                  )}
+              <Pressable
+                key={city.city_id}
+                onPress={() => {
+                  setSelectedCity(city);
+                  setCityModalOpen(true);
+                }}
+              >
+                <Card style={styles.cityCard}>
+                  <View style={styles.cityCardInner}>
+                    {city.image ? (
+                      <Image
+                        source={{ uri: city.image }}
+                        style={styles.cityImage}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <View style={styles.cityImagePlaceholder} />
+                    )}
 
-                  {/* Text section */}
-                  <View style={styles.cityInfo}>
-                    <Text style={styles.cityName}>
-                      {city.city_name}, {city.country}
-                    </Text>
+                    <View style={styles.cityInfo}>
+                      <Text style={styles.cityName}>
+                        {city.city_name}, {city.country}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              </Card>
+                </Card>
+              </Pressable>
             ))}
+
 
           </View>
         )}
       </ScrollView>
+      <Modal
+        visible={cityModalOpen}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setCityModalOpen(false)}
+      >
+        {/* dark background overlay */}
+        <Pressable
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.4)',
+            justifyContent: 'center',
+          }}
+          onPress={() => setCityModalOpen(false)}
+        >
+          {/* modal card (stops closing when you tap inside) */}
+          <Pressable style={styles.cityModalContainer}>
+            {selectedCity && (
+              <View>
+                <Text style={styles.cityModalTitle}>
+                  {selectedCity.city_name}, {selectedCity.country}
+                </Text>
+
+                {selectedCity.image ? (
+                  <Image
+                    source={{ uri: selectedCity.image }}
+                    style={styles.cityModalImage}
+                    resizeMode="cover"
+                  />
+                ) : null}
+
+                <Text style={styles.cityModalDescription}>
+                  {selectedCity.description || 'No description available.'}
+                </Text>
+
+                <Button
+                  mode="contained"
+                  onPress={() => setCityModalOpen(false)}
+                  style={styles.cityModalCloseBtn}
+                >
+                  Close
+                </Button>
+              </View>
+            )}
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+
     </SafeAreaView>
   );
 };
