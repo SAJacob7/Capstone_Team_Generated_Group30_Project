@@ -8,7 +8,7 @@ import { styles } from './app_styles.styles';
 import { Animated, Easing } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { getAuth } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../FirebaseConfig';
 
 
@@ -27,6 +27,12 @@ interface Recommendation {
   description?: string;
   image?: string;
 }
+
+type City = {
+    city_name: string;
+    country_name: string;
+    score: number;
+    };
 
 // Define the type for Home screen navigation prop
 type RecommendationScreenProp = NativeStackNavigationProp<RootParamList, 'Recommendations'>;
@@ -76,6 +82,10 @@ const Recommendations = () => {
   const [curIndex, setCurrentIndex] = useState(0);
   const position = useRef(new Animated.ValueXY()).current;
   const doubleTap = useRef<number | null>(null);
+
+  const recommendationsRef = useRef<Recommendation[]>([]);
+  const curIndexRef = useRef(0);
+
 
 
   const fetchWikivoyageIntro = async ( cityName: string, country: string): Promise<string | null> => {
@@ -194,7 +204,6 @@ const Recommendations = () => {
               return { ...city, ...extra };
             })
           );
-          
           setRecommendations(enrichedRecs);
         } else {
           setError('No recommendations found. Please complete your profile setup.'); // Change to some loading screen
@@ -211,30 +220,84 @@ const Recommendations = () => {
     loadRecommendations();
   }, []);
 
-  const rightSwipe = async (city: Recommendation) => {
-    //Anna add code here!!
+  useEffect(() => {
+    recommendationsRef.current = recommendations;
+  }, [recommendations]);
+
+  useEffect(() => {
+    curIndexRef.current = curIndex;
+  }, [curIndex]);
+
+  const rightSwipe = async (cityId: string, city: City) => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    
+    if (!user) {
+      alert('Error, User must be signed in!');
+      return;
+    }
+
+    try{
+      const userDocRef = doc(FIREBASE_DB, 'userFavorites', user.uid);
+      await setDoc(userDocRef, {[`${cityId}`]: city}, {merge: true});
+      alert('Success, Your favorites have been saved!');
+    }
+    catch (error) {
+      console.error('Encountered an error while saving your favorites:', error);
+      alert('Error, There was an error while saving your favorites.')
+    }
   }
 
-  const leftSwipe = async (city: Recommendation) => {
-    //Anna add code here!!
-  }
+  const leftSwipe = async (cityId: string, city: City) => {
+    const auth = getAuth();
+    const user = auth.currentUser;
 
-  const swipeFucntion = (direction: 'left' | 'right') => {
+    if (!user) {
+      alert('Error, User must be signed in!');
+      return;
+    }
+
+    try{
+      const userDocRef = doc(FIREBASE_DB, 'userDislikes', user.uid);
+      await setDoc(userDocRef, {[`${cityId}`]: city}, {merge: true});
+      alert('Success, Your disliked city have been saved!');
+    }
+    catch (error) {
+      console.error('Encountered an error while saving your dislikes:', error);
+      alert('Error, There was an error while saving your dislikes.')
+    }
+}
+
+  const swipeFunction = (direction: 'left' | 'right') => {
+    const recs = recommendationsRef.current;
+    const index = curIndexRef.current;
+
     const x = direction === 'right' ? screenWidth : -screenWidth;
     Animated.timing(position, {
       toValue: {x, y: 0},
       duration: 300,
       useNativeDriver: false,
     }).start(() => {
-      if (direction === 'right'){
-        rightSwipe(recommendations[curIndex]);
-      }
-      else {
-        leftSwipe(recommendations[curIndex]);
-      }
 
-      setCurrentIndex(prev => prev + 1);
-      position.setValue({x:0, y:0});
+    const city = recs[index];
+
+    if (direction === 'right'){
+      rightSwipe(city.city_id, {
+        city_name: city.city_name,
+        country_name: city.country,
+        score: city.score,
+      });
+    }
+    else {
+      leftSwipe(city.city_id, {
+        city_name: city.city_name,
+        country_name: city.country,
+        score: city.score,
+      });
+    }
+
+    setCurrentIndex(prev => prev + 1);
+    position.setValue({x:0, y:0});
     });
   };
 
@@ -247,10 +310,10 @@ const Recommendations = () => {
       },
       onPanResponderRelease: (_, gesture) => {
         if (gesture.dx > 120) {
-          swipeFucntion('right');
+          swipeFunction('right');
         }
         else if (gesture.dx < -120){
-          swipeFucntion('left');
+          swipeFunction('left');
         }
         else {
           Animated.spring(position, {
