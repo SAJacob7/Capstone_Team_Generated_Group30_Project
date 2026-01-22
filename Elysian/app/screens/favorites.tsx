@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Card } from 'react-native-paper';
 import { styles } from './app_styles.styles';
 import { getAuth } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteField } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../FirebaseConfig';
 
 // Same interface as Home ... maybe change ?
@@ -22,7 +22,7 @@ interface Recomendation {
   image?: string;
 }
 
-// Likes component 
+// Favorites component 
 const Favorites = () => {
   const [favorites, setFavorites] = useState<Recomendation[]>([]);
   const [loading, setLoading] = useState(false);
@@ -47,6 +47,26 @@ const Favorites = () => {
       console.error('Error fetching city image:', err);
       return undefined;
     }
+
+    // Handles unfavoriting cities and stores it in Firebase
+    const removeFavoriteCity = async (cityId: string) => {
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (!user) {
+        alert('Error, User must be signed in!');
+        return;
+      }
+
+      try {
+        const userDocRef = doc(FIREBASE_DB, 'userFavorites', user.uid);
+        await setDoc(userDocRef, { [`${cityId}`]: deleteField() }, { merge: true });
+        alert('Success, your favorite has been removed!');
+      } catch (error) {
+        console.error('Error removing favorite city:', error);
+        alert('Error removing favorite city.');
+      }
+    };
   };
 
   // Load liked locations from Firestore 
