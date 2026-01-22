@@ -13,7 +13,7 @@ app = Flask(__name__)
 # ---------------------------------------------------------
 # Firebase init
 # ---------------------------------------------------------
-cred = credentials.Certificate("../elysianproject-2b9ce-firebase-adminsdk-fbsvc-542db33246.json")
+cred = credentials.Certificate("elysianproject-2b9ce-firebase-adminsdk-fbsvc-542db33246.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
