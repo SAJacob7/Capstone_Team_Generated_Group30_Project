@@ -4,3 +4,4 @@ numpy
 pandas
 gunicorn
 joblib
+sklearn
