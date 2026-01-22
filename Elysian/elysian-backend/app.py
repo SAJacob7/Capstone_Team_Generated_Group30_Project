@@ -3,8 +3,20 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 import joblib
+from numpy.linalg import norm
+import firebase_admin
+from firebase_admin import credentials, firestore
+
 
 app = Flask(__name__)
+
+# ---------------------------------------------------------
+# Firebase init
+# ---------------------------------------------------------
+cred = credentials.Certificate("../elysianproject-2b9ce-firebase-adminsdk-fbsvc-542db33246.json")
+firebase_admin.initialize_app(cred)
+db = firestore.client()
+
 
 # ---------------------------------------------------------
 # Load encoders
@@ -18,6 +30,13 @@ mlbs = joblib.load("mlbs.pkl")   # dict of MultiLabelBinarizers
 # ---------------------------------------------------------
 cities_df = pd.read_csv("../../Datasets/cities.csv")
 city_vectors = np.load("city_vectors.npy")   # shape: (num_cities, embedding_dim)
+
+# Map city_id -> index in cities_df / city_vectors
+city_id_to_idx = {
+    row["city_id"]: idx
+    for idx, row in cities_df.iterrows()
+}
+
 
 # ---------------------------------------------------------
 # Load user-only TFLite model
@@ -87,6 +106,87 @@ def get_user_embedding(origin_enc, fav_enc, multi_hot):
     user_vec = interpreter.get_tensor(output_details[0]["index"])[0]
     return user_vec
 
+# ---------------------------------------------------------
+# Firebase helpers: likes/dislikes
+# ---------------------------------------------------------
+def get_user_feedback(user_id):
+    fav_doc = db.collection("userFavorites").document(user_id).get()
+    dislike_doc = db.collection("userDislikes").document(user_id).get()
+
+    liked = list(fav_doc.to_dict().keys()) if fav_doc.exists else []
+    disliked = list(dislike_doc.to_dict().keys()) if dislike_doc.exists else []
+
+    return liked, disliked
+
+
+def swipe(user_id, city_id, liked: bool):
+    collection = "userFavorites" if liked else "userDislikes"
+    doc_ref = db.collection(collection).document(user_id)
+    # merge city_id as a field; value doesn't matter for ranking
+    doc_ref.set({city_id: True}, merge=True)
+
+
+
+def to_indices(city_ids):
+    return [city_id_to_idx[cid] for cid in city_ids if cid in city_id_to_idx]
+
+# ---------------------------------------------------------
+# Similarity + ranking
+# ---------------------------------------------------------
+def cosine(a, b):
+    return np.dot(a, b) / (norm(a) * norm(b) + 1e-8)
+
+
+def similarity_to_group(city_vec, group_idx):
+    if not group_idx:
+        return 0.0
+    sims = [cosine(city_vec, city_vectors[i]) for i in group_idx]
+    return float(np.mean(sims))
+
+
+ALPHA = 1.0
+BETA = 0.7
+GAMMA = 0.7
+
+
+def get_dynamic_scores(user_vec, user_id):
+    liked_ids, disliked_ids = get_user_feedback(user_id)
+    liked_idx = to_indices(liked_ids)
+    disliked_idx = to_indices(disliked_ids)
+
+    base_scores = city_vectors @ user_vec  # same as before
+
+    final_scores = []
+    for i, city_vec in enumerate(city_vectors):
+        sim_liked = similarity_to_group(city_vec, liked_idx)
+        sim_disliked = similarity_to_group(city_vec, disliked_idx)
+
+        score = (
+            ALPHA * base_scores[i] +
+            BETA * sim_liked -
+            GAMMA * sim_disliked
+        )
+        final_scores.append(score)
+
+    return np.array(final_scores), liked_idx, disliked_idx
+def next_city(user_vec, user_id):
+    scores, liked_idx, disliked_idx = get_dynamic_scores(user_vec, user_id)
+
+    # Exclude already swiped cities
+    seen = set(liked_idx + disliked_idx)
+    for idx in seen:
+        scores[idx] = -1e9  # effectively remove
+
+    next_idx = int(np.argmax(scores))
+    row = cities_df.iloc[next_idx]
+
+    return {
+        "city_id": row["city_id"],
+        "city_name": row["city_name"],
+        "country": row["country"],
+        "score": float(scores[next_idx])
+    }
+
 
 # ---------------------------------------------------------
 # Recommendation endpoint
@@ -120,6 +220,36 @@ def recommend():
             })
 
         return jsonify({"recommendations": results})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/next_city", methods=["POST"])
+def api_next_city():
+    try:
+        data = request.get_json()
+        user_id = data["user_id"]  # you must send this from frontend
+
+        # Same encoding as /recommend
+        origin_enc, fav_enc, multi_hot = encode_user_inputs(data)
+        user_vec = get_user_embedding(origin_enc, fav_enc, multi_hot)
+
+        city = next_city(user_vec, user_id)
+        return jsonify({"city": city})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/swipe", methods=["POST"])
+def api_swipe():
+    try:
+        data = request.get_json()
+        user_id = data["user_id"]
+        city_id = data["city_id"]
+        liked = bool(data["liked"])  # true = like, false = dislike
+
+        swipe(user_id, city_id, liked)
+        return jsonify({"status": "ok"})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
