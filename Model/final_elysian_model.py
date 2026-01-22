@@ -47,8 +47,7 @@ label_encoders = {}
 
 # Encode categorical features for queries
 categorical_features_queries = [
-    'origin_country', 'seasons', 'budget', 'favorite_country_visited',
-    'travel_distance', 'place_type'
+    'origin_country', 'seasons', 'budget', 'favorite_country_visited', 'place_type'
 ]
 
 print("Encoding query features...")
@@ -206,7 +205,7 @@ print("\n=== Preparing Model Inputs ===")
 # Define query features (only use ones that exist)
 query_features = []
 for feature in ['origin_country_encoded', 'seasons_encoded', 'budget_encoded',
-                'favorite_country_visited_encoded', 'travel_distance_encoded', 'place_type_encoded']:
+                'favorite_country_visited_encoded', 'place_type_encoded']:
     if feature in training_data.columns:
         query_features.append(feature)
 
@@ -325,6 +324,9 @@ else:
       # Prepare all cities for prediction
       city_cat_all = cities_df[city_features].values
       city_vacation_all = vacation_types_encoded_cities
+      city_feature_matrix = np.concatenate([city_cat_all, city_vacation_all], axis=1)
+      np.save('city_feature_matrix.npy', city_feature_matrix)
+      cities_df.to_csv('cities_encoded1.csv', index=False)
 
       # Repeat query features for all cities
       query_cat_repeated = np.tile(query_cat, (len(cities_df), 1))
