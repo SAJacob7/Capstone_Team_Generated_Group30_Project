@@ -6,5 +6,4 @@ gunicorn
 joblib
 scikit-learn
 firebase_admin
-os
-json
+requests
