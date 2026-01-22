@@ -6,14 +6,17 @@ import joblib
 from numpy.linalg import norm
 import firebase_admin
 from firebase_admin import credentials, firestore
-
+import os
+import json
 
 app = Flask(__name__)
 
 # ---------------------------------------------------------
 # Firebase init
 # ---------------------------------------------------------
-cred = credentials.Certificate("elysianproject-2b9ce-firebase-adminsdk-fbsvc-542db33246.json")
+
+service_account_info = json.loads(os.environ["FIREBASE_SERVICE_ACCOUNT"])
+cred = credentials.Certificate(service_account_info)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
