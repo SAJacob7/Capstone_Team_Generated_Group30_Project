@@ -64,20 +64,6 @@ const ProfileSetup = () => {
   const [vacationTypes, setVacationTypes] = useState<string[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false); // Stores whether to open the drop down if the user has typed or not.
 
-  // Fetch label mappings dynamically from backend
-  useEffect(() => {
-    const loadMappings = async () => {
-      try {
-        const response = await fetch('https://capstone-team-generated-group30-project.onrender.com/metadata');
-        const data = await response.json();
-        setLabelMappings(data.label_mappings);
-        setVacationTypes(data.vacation_types);
-      } catch (err) {
-        console.error('Error loading label mappings:', err);
-      }
-    };
-    loadMappings();
-  }, []);
 
   const currentQuestion = questions[currentQuestionIndex]; // Sets the current question based on current inde
   // const isShortAnswer = currentQuestion.answer.length === 0; // If there is no answers to display, it is a short answer question; otherwise, it's multi-select
@@ -90,61 +76,62 @@ const ProfileSetup = () => {
 
   // Pick color from the 4-color cycle
   const currentSelectedColor = selectedColors[buttonQuestionIndex % selectedColors.length];
-  const normalize = (s: string) =>
-    s.toString().trim();
 
-  const encodeUserInput = (userInput: Record<string, string>) => {
-    const categoricalFeatures = [
-      'origin_country',
-      'seasons',
-      'budget',
-      'favorite_country_visited',
-      'travel_distance',
-      'place_type',
-    ];
+  // const normalize = (s: string) =>
+  //   s.toString().trim();
 
-    //This encodes it into categorical features
-    const userCatEncoded = categoricalFeatures.map((feature) => {
-      const classes = labelMappings[feature];
-      const value = normalize(userInput[feature] ?? '');
-      if (classes && classes.includes(value)) {
-        return classes.indexOf(value);
-      } else {
-        console.warn(`Unseen label '${value}' for feature '${feature}'`);
-        return -1;
-      }
-    });
+  // const encodeUserInput = (userInput: Record<string, string>) => {
+  //   const categoricalFeatures = [
+  //     'origin_country',
+  //     'favorite_country_visited',
+  //     'vacation_types'
+  //     'seasons',
+  //     'budget',
+  //     'place_type',
+  //   ];
 
-    //This encodes the vacation features
-    const userVacationEncoded = new Array(vacationTypes.length).fill(0);
-    if (userInput.vacation_types) {
-      const vacationList = userInput.vacation_types.split('|');
-      vacationList.forEach((vt) => {
-        const idx = vacationTypes.indexOf(vt);
-        if (idx >= 0) userVacationEncoded[idx] = 1;
-      });
-    }
+  //   //This encodes it into categorical features
+  //   const userCatEncoded = categoricalFeatures.map((feature) => {
+  //     const classes = labelMappings[feature];
+  //     const value = normalize(userInput[feature] ?? '');
+  //     if (classes && classes.includes(value)) {
+  //       return classes.indexOf(value);
+  //     } else {
+  //       console.warn(`Unseen label '${value}' for feature '${feature}'`);
+  //       return -1;
+  //     }
+  //   });
 
-    return { categorical: userCatEncoded, vacationTypes: userVacationEncoded };
-  };
-  const mapResponsesToFeatures = (responses: { [key: number]: string[] | string }) => {
-    return {
-      origin_country: responses[0] as string,
-      vacation_types: Array.isArray(responses[1]) ? responses[1].join('|') : responses[1],
-      seasons: Array.isArray(responses[2]) ? responses[2].join('|') : responses[2],
-      budget: Array.isArray(responses[3]) ? responses[3].join('|') : responses[3],
-      favorite_country_visited: responses[4] as string,
-      travel_distance: responses[5] as string,
-      place_type: Array.isArray(responses[6]) ? responses[6].join('|') : responses[6],
-    };
-  };  
+  //   //This encodes the vacation features
+  //   const userVacationEncoded = new Array(vacationTypes.length).fill(0);
+  //   if (userInput.vacation_types) {
+  //     const vacationList = userInput.vacation_types.split('|');
+  //     vacationList.forEach((vt) => {
+  //       const idx = vacationTypes.indexOf(vt);
+  //       if (idx >= 0) userVacationEncoded[idx] = 1;
+  //     });
+  //   }
+
+  //   return { categorical: userCatEncoded, vacationTypes: userVacationEncoded };
+  // };
+  // const mapResponsesToFeatures = (responses: { [key: number]: string[] | string }) => {
+  //   return {
+  //     origin_country: responses[0] as string,
+  //     vacation_types: Array.isArray(responses[1]) ? responses[1].join('|') : responses[1],
+  //     seasons: Array.isArray(responses[2]) ? responses[2].join('|') : responses[2],
+  //     budget: Array.isArray(responses[3]) ? responses[3].join('|') : responses[3],
+  //     favorite_country_visited: responses[4] as string,
+  //     travel_distance: responses[5] as string,
+  //     place_type: Array.isArray(responses[6]) ? responses[6].join('|') : responses[6],
+  //   };
+  // };  
 
   const fetchRecommendations = async (finalResponses: { [key: string]: string[] | string }) => {
     
-    if (!Object.keys(labelMappings).length) {
-      console.error('Encoders not loaded yet');
-      return;
-    }
+    // if (!Object.keys(labelMappings).length) {
+    //   console.error('Encoders not loaded yet');
+    //   return;
+    // }
     const auth = getAuth();
     const user = auth.currentUser;
     if (!user) {
@@ -159,15 +146,23 @@ const ProfileSetup = () => {
       //   Array.isArray(value) ? value.join('|') : value,
       // ])
       // );
-      const normalizedResponses = mapResponsesToFeatures(finalResponses);
-      const encoded = encodeUserInput(normalizedResponses);
-      const queryVector = [...encoded.categorical, ...encoded.vacationTypes];
-      console.log(queryVector)
+      // const normalizedResponses = mapResponsesToFeatures(finalResponses);
+      // const encoded = encodeUserInput(normalizedResponses);
+      // const queryVector = [...encoded.categorical, ...encoded.vacationTypes];
+      // console.log(queryVector)
 
+      const userInput = {
+        'origin_country': responses[0],
+        'favorite_country_visited': responses[4],
+        'vacation_types': responses[1],
+        'seasons': responses[2],
+        'budget': responses[3],
+        'place_type': responses[5]
+      }
       const response = await fetch('https://capstone-team-generated-group30-project.onrender.com/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query_vector: queryVector })
+        body: JSON.stringify(userInput)
       });
 
       const data = await response.json(); // Once we have given the data, it will run the hosted app.py to generate recommendations from the model.

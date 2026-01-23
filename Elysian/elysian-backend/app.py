@@ -16,6 +16,8 @@ app = Flask(__name__)
 # ---------------------------------------------------------
 
 service_account_info = json.loads(os.environ["FIREBASE_SERVICE_ACCOUNT"])
+# service_account_info = "elysianproject-2b9ce-firebase-adminsdk-fbsvc-542db33246.json"
+
 cred = credentials.Certificate(service_account_info)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
@@ -121,13 +123,18 @@ def get_user_feedback(user_id):
 
     return liked, disliked
 
+def adjust_user_embedding(user_vec, liked_idx, disliked_idx, lr=0.1):
+    if liked_idx:
+        liked_vecs = city_vectors[liked_idx]
+        user_vec += lr * np.mean(liked_vecs, axis=0)
 
-def swipe(user_id, city_id, liked: bool):
-    collection = "userFavorites" if liked else "userDislikes"
-    doc_ref = db.collection(collection).document(user_id)
-    # merge city_id as a field; value doesn't matter for ranking
-    doc_ref.set({city_id: True}, merge=True)
+    if disliked_idx:
+        disliked_vecs = city_vectors[disliked_idx]
+        user_vec -= lr * np.mean(disliked_vecs, axis=0)
 
+    # Normalize to keep vector stable
+    user_vec = user_vec / (np.linalg.norm(user_vec) + 1e-8)
+    return user_vec
 
 
 def to_indices(city_ids):
@@ -236,27 +243,16 @@ def api_next_city():
         # Same encoding as /recommend
         origin_enc, fav_enc, multi_hot = encode_user_inputs(data)
         user_vec = get_user_embedding(origin_enc, fav_enc, multi_hot)
+        liked_ids, disliked_ids = get_user_feedback(user_id)
+        liked_idx = to_indices(liked_ids)
+        disliked_idx = to_indices(disliked_ids)
+        user_vec = adjust_user_embedding(user_vec, liked_idx, disliked_idx)
 
         city = next_city(user_vec, user_id)
         return jsonify({"city": city})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-@app.route("/swipe", methods=["POST"])
-def api_swipe():
-    try:
-        data = request.get_json()
-        user_id = data["user_id"]
-        city_id = data["city_id"]
-        liked = bool(data["liked"])  # true = like, false = dislike
-
-        swipe(user_id, city_id, liked)
-        return jsonify({"status": "ok"})
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
 
 @app.route("/")
 def home():
