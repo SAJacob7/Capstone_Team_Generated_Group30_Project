@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Card, Modal, Button } from 'react-native-paper';
 import { styles } from './app_styles.styles';
 import { getAuth } from 'firebase/auth';
-import { doc, onSnapshot, updateDoc, deleteField } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc, deleteField, setDoc } from 'firebase/firestore';
 import { FIREBASE_DB } from '../../FirebaseConfig';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -98,20 +98,35 @@ const Favorites = () => {
       return undefined;
     }
   };
-  const removeFavorite = async (cityId: string) => {
+  const removeFavorite = async (city: Recomendation) => {
     try {
       const auth = getAuth();
       const user = auth.currentUser;
       if (!user) return;
   
       const favoritesRef = doc(FIREBASE_DB, 'userFavorites', user.uid);
+      const dislikesRef = doc(FIREBASE_DB, 'userDislikes', user.uid);
   
+      // 1) Remove from favorites
       await updateDoc(favoritesRef, {
-        [cityId]: deleteField(),
+        [city.city_id]: deleteField(),
       });
+  
+      // 2) Add to dislikes (merge so we don't overwrite existing dislikes)
+      await setDoc(
+        dislikesRef,
+        {
+          [city.city_id]: {
+            city_name: city.city_name,
+            country_name: city.country,
+            ts: Date.now(),
+          },
+        },
+        { merge: true }
+      );
     } catch (err) {
       console.error('Error removing favorite:', err);
-      setError('Could not remove that place.');
+      setError('Could not update that place.');
     }
   };  
 
@@ -191,7 +206,7 @@ const Favorites = () => {
 
         {!loading && favorites.length > 0 && (
           <View style={styles.resultsContainer}>
-            <Text style={styles.sectionTitle}>Liked Cities:</Text>
+            
 
             {favorites.map((city) => (
               <Pressable
@@ -203,27 +218,28 @@ const Favorites = () => {
               >
                 <Card style={styles.cityCard}>
                   <View style={styles.cityCardInner}>
-                    {/* Remove button (top-right) */}
-                    <Pressable
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        removeFavorite(city.city_id);
-                      }}
-                      style={[styles.removeIconBtn, styles.removeIconBtnShadow]}
-                    >
-                      <MaterialCommunityIcons name="close" size={18} color="#222" />
-                    </Pressable>
+                    {/* Image + heart overlay */}
+                    <View style={styles.imageWrapper}>
+                      <Pressable
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          removeFavorite(city);
+                        }}
+                        style={[styles.removeIconBtn, styles.removeIconBtnShadow]}
+                      >
+                        <MaterialCommunityIcons name="heart" size={18} color="#fff" />
+                      </Pressable>
 
-                    {/* Image */}
-                    {city.image ? (
-                      <Image
-                        source={{ uri: city.image }}
-                        style={styles.cityImage}
-                        resizeMode="cover"
-                      />
-                    ) : (
-                      <View style={styles.cityImagePlaceholder} />
-                    )}
+                      {city.image ? (
+                        <Image
+                          source={{ uri: city.image }}
+                          style={styles.cityImage}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <View style={styles.cityImagePlaceholder} />
+                      )}
+                    </View>
 
                     {/* City name */}
                     <View style={styles.cityInfo}>
@@ -260,14 +276,6 @@ const Favorites = () => {
             <Text style={styles.cityModalDescription}>
               {selectedCity.description || 'No description available.'}
             </Text>
-
-            <Button
-                mode="outlined"
-                onPress={() => removeFavorite(selectedCity.city_id)}
-                style={{ marginBottom: 10 }}
-              >
-                Remove from favorites
-              </Button>
 
               <Button
                 mode="contained"
