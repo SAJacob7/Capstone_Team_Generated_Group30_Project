@@ -3,3 +3,7 @@ tensorflow
 numpy
 pandas
 gunicorn
+joblib
+scikit-learn
+firebase_admin
+requests

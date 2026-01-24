@@ -74,19 +74,18 @@ const Recommendations = () => {
   // Initialize navigation with type safety
   const navigation = useNavigation<RecommendationScreenProp>();
   const [loading, setLoading] = useState(false);
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [selectedCity, setSelectedCity] = useState<Recommendation | null>(null);
   const [cityModalOpen, setCityModalOpen] = useState(false);
   const screenWidth = Dimensions.get('window').width;
-  const [curIndex, setCurrentIndex] = useState(0);
   const position = useRef(new Animated.ValueXY()).current;
   const doubleTap = useRef<number | null>(null);
+  const [currentCity, setCurrentCity] = useState<Recommendation | null>(null);
+  const currentCityRef = useRef<Recommendation | null>(null);
 
-  const recommendationsRef = useRef<Recommendation[]>([]);
-  const curIndexRef = useRef(0);
-
-
+  useEffect(() => {
+    currentCityRef.current = currentCity;
+  }, [currentCity]);
 
   const fetchWikivoyageIntro = async ( cityName: string, country: string): Promise<string | null> => {
     const titlesToTry = [
@@ -126,7 +125,6 @@ const Recommendations = () => {
   
     return null;
   };
-  
   
   const shorten = (text: string, sentences = 3) => {
     const cleaned = text.replace(/\s+/g, ' ').trim();
@@ -178,55 +176,29 @@ const Recommendations = () => {
     }
   };  
 
-  // Load recommendations from Firestore
   useEffect(() => {
-    const loadRecommendations = async () => {
+    const loadInitial = async () => {
       setLoading(true);
       try {
         const auth = getAuth();
         const user = auth.currentUser;
-        if (!user) {
-          setError('No user signed in.');
-          setLoading(false);
-          return;
-        }
+        if (!user) throw new Error("No user");
 
-        const userRecRef = doc(FIREBASE_DB, 'userRec', user.uid);
-        const snapshot = await getDoc(userRecRef);
-
-        if (snapshot.exists()) {
-          const data = snapshot.data();
-          const recs: Recommendation[] = data.gen_recommendations || [];
-
-          const enrichedRecs = await Promise.all(
-            recs.map(async (city) => {
-              const extra = await fetchCityInfo(city.city_name, city.country);
-              return { ...city, ...extra };
-            })
-          );
-          setRecommendations(enrichedRecs);
-        } else {
-          setError('No recommendations found. Please complete your profile setup.'); // Change to some loading screen
-        }
+        const city = await fetchNextCity(user.uid);
+        const extra = await fetchCityInfo(city.city_name, city.country);
+        setCurrentCity({ ...city, ...extra });
+        console.log(currentCity)
 
       } catch (err) {
-        console.error('Error loading recommendations:', err);
-        setError('Failed to load recommendations.');
+        console.error(err);
+        setError("Failed to get recommendations");
       } finally {
         setLoading(false);
       }
     };
 
-    loadRecommendations();
+    loadInitial();
   }, []);
-
-  useEffect(() => {
-    recommendationsRef.current = recommendations;
-  }, [recommendations]);
-
-  useEffect(() => {
-    curIndexRef.current = curIndex;
-  }, [curIndex]);
 
   const rightSwipe = async (cityId: string, city: City) => {
     const auth = getAuth();
@@ -237,10 +209,13 @@ const Recommendations = () => {
       return;
     }
 
-    try{
+    try {
       const userDocRef = doc(FIREBASE_DB, 'userFavorites', user.uid);
       await setDoc(userDocRef, {[`${cityId}`]: city}, {merge: true});
-      alert('Success, Your favorites have been saved!');
+      // await sendSwipe(user.uid, cityId, true); // Update backend with the swipe
+      const nextCity = await fetchNextCity(user.uid);
+      const extra = await fetchCityInfo(nextCity.city_name, nextCity.country);
+      setCurrentCity({ ...nextCity, ...extra });
     }
     catch (error) {
       console.error('Encountered an error while saving your favorites:', error);
@@ -260,17 +235,67 @@ const Recommendations = () => {
     try{
       const userDocRef = doc(FIREBASE_DB, 'userDislikes', user.uid);
       await setDoc(userDocRef, {[`${cityId}`]: city}, {merge: true});
-      alert('Success, Your disliked city have been saved!');
+      // await sendSwipe(user.uid, cityId, false); // Update backend with the swipe
+      const nextCity = await fetchNextCity(user.uid);
+      const extra = await fetchCityInfo(nextCity.city_name, nextCity.country);
+      setCurrentCity({ ...nextCity, ...extra });
     }
     catch (error) {
       console.error('Encountered an error while saving your dislikes:', error);
       alert('Error, There was an error while saving your dislikes.')
     }
+  }
+
+async function getUserProfileAnswers(userId: string) {
+  const ref = doc(FIREBASE_DB, "userProfiles", userId);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    throw new Error("User profile not found");
+  }
+
+  const data = snap.data();
+  const responses = data.responses;
+
+  return {
+    origin_country: responses[0],
+    vacation_types: responses[1] || [],
+    seasons: responses[2] || [],
+    budget: responses[3] || [],
+    favorite_country_visited: responses[4],
+    place_type: responses[5] || []
+  };
 }
 
+  async function fetchNextCity(userId: string) {
+    // You need to supply the same profile answers you used to generate recs.
+    // If you stored them in Firestore, read them here; for now assume you have them.
+    const profile = await getUserProfileAnswers(userId);
+
+    const res = await fetch('https://capstone-team-generated-group30-project.onrender.com/next_city', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        user_id: userId,
+        ...profile,
+      }),
+    });
+
+    if (!res.ok) throw new Error('Failed to fetch next city');
+    const json = await res.json();
+    return json.city as Recommendation;
+  }
+
+  // async function sendSwipe(userId: string, cityId: string, liked: boolean) {
+  //   await fetch('https://capstone-team-generated-group30-project.onrender.com/swipe', {
+  //     method: 'POST',
+  //     headers: {'Content-Type': 'application/json'},
+  //     body: JSON.stringify({ user_id: userId, city_id: cityId, liked }),
+  //   });
+  // }
+
   const swipeFunction = (direction: 'left' | 'right') => {
-    const recs = recommendationsRef.current;
-    const index = curIndexRef.current;
+    if (!currentCityRef.current) return;
 
     const x = direction === 'right' ? screenWidth : -screenWidth;
     Animated.timing(position, {
@@ -279,7 +304,8 @@ const Recommendations = () => {
       useNativeDriver: false,
     }).start(() => {
 
-    const city = recs[index];
+    const city = currentCityRef.current;
+    if (!city) return;
 
     if (direction === 'right'){
       rightSwipe(city.city_id, {
@@ -295,8 +321,6 @@ const Recommendations = () => {
         score: city.score,
       });
     }
-
-    setCurrentIndex(prev => prev + 1);
     position.setValue({x:0, y:0});
     });
   };
@@ -328,7 +352,6 @@ const Recommendations = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.homeContainer}>
-        
         {/* Title */}
         <Text variant="headlineLarge" style={styles.homeTitle}>
           Recommendations
@@ -336,75 +359,77 @@ const Recommendations = () => {
 
         {/* Loading */}
         {loading && (
-          <Text style={styles.sectionTitle}>Loading recommendations...</Text>
+          <Text style={styles.sectionTitle}>Loading recommendation...</Text>
         )}
 
         {/* Error */}
-        {error && !loading && (
-          <Text>{error}</Text>
-        )}
+        {error && !loading && <Text>{error}</Text>}
 
-        {/* Recommendations */}
-        {recommendations.length > 0 && !loading && (
+        {/* Current City Card */}
+        {!loading && !error && (
           <View style={styles.resultsContainer}>
-            {recommendations[curIndex] ? (
-              <Animated.View 
-              style={[
-                styles.cityCard, 
-                {
-                  transform: [
-                    {translateX: position.x}, 
-                    {translateY: position.y},
-                    {rotate: position.x.interpolate({
-                      inputRange: [-screenWidth, 0, screenWidth], 
-                      outputRange: ['-15deg', '0deg', '15deg'],
-                    }),
+            {currentCity ? (
+              <Animated.View
+                style={[
+                  styles.cityCard,
+                  {
+                    transform: [
+                      { translateX: position.x },
+                      { translateY: position.y },
+                      {
+                        rotate: position.x.interpolate({
+                          inputRange: [-screenWidth, 0, screenWidth],
+                          outputRange: ['-15deg', '0deg', '15deg'],
+                        }),
+                      },
+                    ],
                   },
-                ],
-              },
-            ]}
-            {...swipeAction.panHandlers}
-            >
-              <Pressable
-              onPress={() => {
-                const now = Date.now();
-                if (doubleTap.current && now - doubleTap.current < 300) {
-                  setSelectedCity(recommendations[curIndex]);
-                  setCityModalOpen(true);
-                }
-                doubleTap.current = now;
-              }}
+                ]}
+                {...swipeAction.panHandlers}
               >
-                <View style={styles.cityCardInner}>
-                  {recommendations[curIndex].image ? (
-                    <Image source={{ uri: recommendations[curIndex].image}} style = {styles.cityImage} resizeMode="cover"/>
-                  ) : (
-                    <View style = {styles.cityImagePlaceholder} />
-                  )}
+                <Pressable
+                  onPress={() => {
+                    const now = Date.now();
+                    if (doubleTap.current && now - doubleTap.current < 300) {
+                      setSelectedCity(currentCity);
+                      setCityModalOpen(true);
+                    }
+                    doubleTap.current = now;
+                  }}
+                >
+                  <View style={styles.cityCardInner}>
+                    {currentCity.image ? (
+                      <Image
+                        source={{ uri: currentCity.image }}
+                        style={styles.cityImage}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <View style={styles.cityImagePlaceholder} />
+                    )}
 
-                  <View style={styles.cityInfo}>
-                    <Text style = {styles.cityName}>
-                      {recommendations[curIndex].city_name}, {" "}
-                      {recommendations[curIndex].country}
-                    </Text>
+                    <View style={styles.cityInfo}>
+                      <Text style={styles.cityName}>
+                        {currentCity.city_name}, {currentCity.country}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              </Pressable>
-            </Animated.View>
-          ) : (
-            <Text> No more recommendations! </Text>
-          )}
-        </View>
-      )}
+                </Pressable>
+              </Animated.View>
+            ) : (
+              <Text>No more recommendations!</Text>
+            )}
+          </View>
+        )}
       </View>
 
+      {/* City Modal */}
       <Modal
         visible={cityModalOpen}
         transparent
         animationType="slide"
         onRequestClose={() => setCityModalOpen(false)}
       >
-        {/* dark background overlay */}
         <Pressable
           style={{
             flex: 1,
@@ -413,7 +438,6 @@ const Recommendations = () => {
           }}
           onPress={() => setCityModalOpen(false)}
         >
-          {/* modal card (stops closing when you tap inside) */}
           <Pressable style={styles.cityModalContainer}>
             {selectedCity && (
               <View>
@@ -421,13 +445,13 @@ const Recommendations = () => {
                   {selectedCity.city_name}, {selectedCity.country}
                 </Text>
 
-                {selectedCity.image ? (
+                {selectedCity.image && (
                   <Image
                     source={{ uri: selectedCity.image }}
                     style={styles.cityModalImage}
                     resizeMode="cover"
                   />
-                ) : null}
+                )}
 
                 <Text style={styles.cityModalDescription}>
                   {selectedCity.description || 'No description available.'}
@@ -445,8 +469,6 @@ const Recommendations = () => {
           </Pressable>
         </Pressable>
       </Modal>
-
-
     </SafeAreaView>
   );
 };

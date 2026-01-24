@@ -24,7 +24,7 @@ interface Recomendation {
   image?: string;
 }
 
-// Likes component 
+// Favorites component 
 const Favorites = () => {
   const [favorites, setFavorites] = useState<Recomendation[]>([]);
   const [loading, setLoading] = useState(false);
