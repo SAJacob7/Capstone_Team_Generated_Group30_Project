@@ -178,6 +178,28 @@ export const styles = StyleSheet.create({
     shadowRadius: 6,
   },
 
+  removeIconBtn: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 10,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    borderRadius: 999,
+    padding: 6,
+  },  
+
+  removeIconBtnShadow: {
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 3,
+  },  
+
+  imageWrapper: {
+    position: 'relative',
+  },
+  
   cityCardInner: {
     borderRadius: 20, // Clips content for rounded edges
     overflow: 'hidden', // Keeps image within rounded corners

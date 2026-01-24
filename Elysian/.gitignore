@@ -42,3 +42,5 @@ yarn-error.*
 
 .env
 elysian-backend/elysianproject-2b9ce-firebase-adminsdk-fbsvc-542db33246.json
+package-lock.json
+**/package-lock.json
