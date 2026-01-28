@@ -274,6 +274,66 @@ export const styles = StyleSheet.create({
     backgroundColor: '#008CFF',
   },
 
+  // ---------------------- Used on Profile page ------------------------------
+  profileImageContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 70,
+  },
+
+  profileImage: {
+    height: 140, 
+    width: 140,
+    borderRadius: 70,
+  },
+
+  editIconContainer: { // Pen icon near profile picture 
+    height: 31,
+    width: 31,
+    borderRadius: 15,
+    backgroundColor: '#008CFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -20,
+    marginLeft: 70,
+  },
+
+  nameContainer: { 
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+
+  name: {
+    fontSize: 25, 
+    marginBottom: 5,
+  },
+
+  username: {
+    fontSize: 20,
+    color: '#999',
+    marginBottom: 10,
+  },
+
+  editError: { // Error message for editing name and username 
+    fontSize: 15,
+    color: 'red',
+    marginBottom: 5, 
+  },
+
+  modalBackground: { // The background when menu pops up 
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  modalContent: { // Menu
+    width: '90%',
+    maxHeight: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 22,
+    padding: 25,
+  },
 });
 
 export const inputTheme = {
